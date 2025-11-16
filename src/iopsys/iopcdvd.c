@@ -6,7 +6,6 @@
 #include "enums.h"
 
 #include <SDL3/SDL_mutex.h>
-#include <SDL3/SDL_timer.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -20,20 +19,61 @@ struct cdvd_stat cdvd_stat;
 struct cdvd_req cdvd_req[32];
 void *load_buf_table[2];
 SDL_Mutex *cdvd_lock;
-SDL_Thread *cdvd_thread;
 
-int SDLCALL ICdvdMain(void *data)
+void ICdvdSetRetStat(u32 cid, char stat)
 {
-    while (1)
-    {
-        SDL_LockMutex(cdvd_lock);
-        if (cdvd_stat.cmd_count)
-        {
-        }
-        SDL_UnlockMutex(cdvd_lock);
+    if (cid < 32)
+        iop_stat.cdvd.fstat[cid].stat = stat;
+}
 
-        SDL_DelayNS(4167000);
+void ICdvdCopyToEE(struct cdvd_req *rq)
+{
+    info_log("read(%x, %x, %p)", rq->sector, rq->size, rq->dst_addr);
+    ReadFileInArchive(rq->sector, rq->size, rq->dst_addr);
+}
+
+void ICdvdDoTransfer(struct cdvd_req *rq)
+{
+    switch (rq->destination)
+    {
+        case 0:// EE
+            ICdvdCopyToEE(rq);
+            break;
+        case 1:// IOP
+            info_log("CDVD transfer to IOP unimplemented");
+            break;
+        case 2:// SPU
+            info_log("CDVD transfer to SPU unimplemented");
+            break;
     }
+
+    SDL_LockMutex(cdvd_lock);
+    cdvd_stat.cmd_rp = (cdvd_stat.cmd_rp + 1) % 32;
+    cdvd_stat.cmd_count--;
+    ICdvdSetRetStat(rq->id, 0);
+    SDL_UnlockMutex(cdvd_lock);
+}
+
+int ICdvdMain()
+{
+    struct cdvd_req rq;
+    bool found_work = false;
+
+    SDL_LockMutex(cdvd_lock);
+
+    if (cdvd_stat.cmd_count)
+    {
+        rq = cdvd_req[cdvd_stat.cmd_rp];
+        found_work = true;
+    }
+
+    SDL_UnlockMutex(cdvd_lock);
+
+    if (found_work)
+    {
+        ICdvdDoTransfer(&rq);
+    }
+
     return 0;
 }
 
@@ -55,7 +95,6 @@ void ICdvdInitOnce()
     ImgHdAddress = LoadImgHdFile();
 
     cdvd_lock = SDL_CreateMutex();
-    cdvd_thread = SDL_CreateThread(ICdvdMain, "CDVD", NULL);
 }
 
 void ICdvdInitSoftReset()
@@ -71,12 +110,6 @@ void ICdvdInit(int mode)
         ICdvdInitSoftReset();
     else
         ICdvdInitOnce();
-}
-
-void ICdvdSetRetStat(u32 cid, char stat)
-{
-    if (cid < 32)
-        iop_stat.cdvd.fstat[cid].stat = stat;
 }
 
 void ICdvdAddCmd(IOP_COMMAND *cmd)

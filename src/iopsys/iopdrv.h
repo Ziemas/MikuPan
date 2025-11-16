@@ -4,6 +4,7 @@
 #include "common.h"
 #include "os/eeiop/eeiop.h"
 
+#include <SDL3/SDL_audio.h>
 #include <stdio.h>
 
 struct cdvd_stat
@@ -22,7 +23,7 @@ struct cdvd_req
     int size;
     int field_10;
     int id;
-    int dst_addr;
+    uintptr_t dst_addr;
     char se_type;
     u8 destination;
     char field_1E;
@@ -33,6 +34,7 @@ struct cdvd_trans
 };
 
 extern IOP_STAT iop_stat;
+extern SDL_AudioDeviceID audio_dev;
 
 void *IopDrvFunc(int fno, void *data, unsigned int length);
 
