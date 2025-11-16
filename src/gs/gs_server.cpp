@@ -187,7 +187,7 @@ void GS::GSHelper::Clear() {
 
 void GsUpload(sceGsLoadImage* image_load, unsigned char* image)
 {
-    spdlog::info("GS upload request for DBP {:#x} DPSM {} ", (unsigned long long)image_load->bitbltbuf.DBP, (unsigned long long)image_load->bitbltbuf.DPSM);
+    //spdlog::info("GS upload request for DBP {:#x} DPSM {} ", (unsigned long long)image_load->bitbltbuf.DBP, (unsigned long long)image_load->bitbltbuf.DPSM);
 
     FirstUploadDone();
 
