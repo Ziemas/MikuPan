@@ -8,6 +8,8 @@
 #include "main/glob.h"
 #include "mikupan/gs/texture_manager.h"
 
+#include <algorithm>
+#include <map>
 #include <string>
 
 extern "C"
@@ -187,23 +189,35 @@ void MikuPan_DrawUi()
     {
         if (ImGui::BeginMenu("Debug"))
         {
-            ImGui::Toggle("FPS Counter", &show_fps, ImGuiToggleFlags_Animated);
-            ImGui::Toggle("Frame Time Graph", &show_frame_time_graph, ImGuiToggleFlags_Animated);
-            ImGui::Toggle("Ingame Debug Menu", (bool*)&dbg_wrk.mode_on, ImGuiToggleFlags_Animated);
-            ImGui::Toggle("Performance Info", (bool*)&dbg_wrk.oth_perf, ImGuiToggleFlags_Animated);
-            ImGui::Toggle("Packet Count", (bool*)&dbg_wrk.oth_pkt_num_sw, ImGuiToggleFlags_Animated);
-            ImGui::Toggle("Controller Config", &controller_config, ImGuiToggleFlags_Animated);
-            ImGui::Toggle("Clear Game", (bool*)&ingame_wrk.clear_count, ImGuiToggleFlags_Animated);
-            ImGui::Toggle("Camera", (bool*)&camera_debug, ImGuiToggleFlags_Animated);
-            ImGui::Toggle("Wireframe", (bool*)&render_wireframe, ImGuiToggleFlags_Animated);
-            ImGui::Toggle("Normals", (bool*)&render_normals, ImGuiToggleFlags_Animated);
-            ImGui::Toggle("Textures", (bool*)&show_texture_list, ImGuiToggleFlags_Animated);
-            if (ImGui::Button("Clear Texture Cache"))
+            if (ImGui::BeginMenu("Camera"))
             {
-                MikuPan_RequestFlushTextureCache();
+                //ImGui::Toggle("Camera", (bool*)&camera_debug, ImGuiToggleFlags_Animated);
+                ImGui::Toggle("Wireframe", (bool*)&render_wireframe, ImGuiToggleFlags_Animated);
+                ImGui::Toggle("Normals", (bool*)&render_normals, ImGuiToggleFlags_Animated);
+                ImGui::Toggle("Textures", (bool*)&show_texture_list, ImGuiToggleFlags_Animated);
+
+                if (ImGui::Button("Clear Texture Cache"))
+                {
+                    MikuPan_RequestFlushTextureCache();
+                }
+
+                ImGui::EndMenu();
             }
+
+            ImGui::Toggle("Ingame Debug Menu", (bool*)&dbg_wrk.mode_on, ImGuiToggleFlags_Animated);
+            ImGui::Toggle("Controller Config", &controller_config, ImGuiToggleFlags_Animated);
+
             ImGui::EndMenu();
         }
+
+        if (ImGui::BeginMenu("Performance"))
+        {
+            ImGui::Toggle("FPS Counter", &show_fps, ImGuiToggleFlags_Animated);
+            ImGui::Toggle("Frame Time Graph", &show_frame_time_graph, ImGuiToggleFlags_Animated);
+
+            ImGui::EndMenu();
+        }
+
         ImGui::EndMainMenuBar();
     }
 
@@ -224,15 +238,9 @@ void MikuPan_DrawUi()
         gra2dDrawDbgMenu();
     }
 
-    if (camera_debug)
-    {
-        //ImGui::InputFloat("Angle Snap", &snap.x);
-    }
-
     if (show_frame_time_graph)
     {
         ImGui::Begin("Frame Time Graph");
-
         g_frame_graph.draw("Frame Time");
         ImGui::End();
     }
@@ -241,15 +249,32 @@ void MikuPan_DrawUi()
     {
         ImGui::Begin("OpenGL Texture");
 
-        for (auto texture : mikupan_render_texture_atlas)
+        // Create a sortable container
+        std::vector<MikuPan_TextureInfo*> sorted_textures;
+        sorted_textures.reserve(mikupan_render_texture_atlas.size());
+
+        // Copy values from unordered_map
+        for (const auto& pair : mikupan_render_texture_atlas)
+        {
+            sorted_textures.push_back(pair.second);
+        }
+
+        // Sort by id
+        std::sort(sorted_textures.begin(), sorted_textures.end(),
+            [](const MikuPan_TextureInfo* a, const MikuPan_TextureInfo* b)
+            {
+                return a->id < b->id;
+            });
+
+        for (auto texture : sorted_textures)
         {
             std::string label = "Texture ID ";
-            label += std::to_string(texture.second->id);
+            label += std::to_string(texture->id);
 
             if (ImGui::CollapsingHeader(label.c_str()))
             {
-                ImGui::Text("%d: %d x %d", texture.second->id, texture.second->width, texture.second->height);
-                ImGui::Image((ImTextureID)(intptr_t)texture.second->id, ImVec2(texture.second->width, texture.second->height));
+                ImGui::Text("%d: %d x %d", texture->id, texture->width, texture->height);
+                ImGui::Image((ImTextureID)(intptr_t)texture->id, ImVec2(texture->width, texture->height));
             }
         }
 

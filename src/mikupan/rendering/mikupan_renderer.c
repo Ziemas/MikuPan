@@ -690,11 +690,11 @@ void MikuPan_SetModelTransform(unsigned int *prim)
     glm_mat4_identity(rot);
     glm_mat4_copy(lcp[prim[1]].workm, m);
 
-    sceVu0RotMatrix(rot, rot, lcp[prim[1]].rot);
-    sceVu0RotMatrixZ(rot, rot, lcp[prim[1]].rot[2]);
-    sceVu0RotMatrixX(rot, rot, lcp[prim[1]].rot[0]);
-    sceVu0RotMatrixY(rot, rot, lcp[prim[1]].rot[1]);
-    glm_mul(m, rot, m);
+    //sceVu0RotMatrix(rot, rot, lcp[prim[1]].rot);
+    //sceVu0RotMatrixX(rot, rot, lcp[prim[1]].rot[0]);
+    //sceVu0RotMatrixY(rot, rot, lcp[prim[1]].rot[1]);
+    //sceVu0RotMatrixZ(rot, rot, lcp[prim[1]].rot[2]);
+    //glm_mul(m, rot, m);
 
     for (int i = 0; i < MAX_SHADER_PROGRAMS; i++)
     {

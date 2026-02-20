@@ -642,7 +642,8 @@ void SubFire1(EFFECT_CONT *ec)
     sceVu0FMATRIX wlm;
     sceVu0FMATRIX slm;
     sceVu0IVECTOR ipos;
-    sceVu0IVECTOR ivec[4];
+    sceVu0FVECTOR ivec[4];
+    //sceVu0IVECTOR ivec[4];
     sceVu0FVECTOR vpos;
     sceVu0FVECTOR vtw[4];
     sceVu0FVECTOR wpos[4] = {
@@ -781,13 +782,15 @@ void SubFire1(EFFECT_CONT *ec)
     sceVu0RotMatrixX(wlm, wlm, PI);
     sceVu0RotMatrixY(wlm, wlm, rot_y);
     sceVu0TransMatrix(wlm, wlm, vpos);
-    sceVu0MulMatrix(slm, SgWSMtx, wlm);
+    sceVu0MulMatrix(slm, *(sceVu0FMATRIX*)MikuPan_GetWorldScreenMatrix(), wlm);
+    //sceVu0MulMatrix(slm, SgWSMtx, wlm);
 
     w = 0;
 
     for (i = 0; i < 4; i++)
     {
-        sceVu0RotTransPers(ivec[i], slm, wpos[i], 0);
+        sceVu0RotTransPersF(ivec[i], slm, wpos[i], 0);
+        //sceVu0RotTransPers(ivec[i], slm, wpos[i], 0);
 
         if (0x8000 < ivec[i][0] - 0x4000U)
         {
@@ -859,23 +862,43 @@ void SubFire1(EFFECT_CONT *ec)
             | SCE_GS_UV    << (4 * 1)
             | SCE_GS_XYZF2 << (4 * 2);
 
+        float* buf = (float*)&pbuf[ndpkt];
+
         for (i = 0; i < 4; i++)
         {
-            pbuf[ndpkt].ui32[0] = mr;
-            pbuf[ndpkt].ui32[1] = mg;
-            pbuf[ndpkt].ui32[2] = mb;
-            pbuf[ndpkt++].ui32[3] = arate * 96.0f;
+            pbuf[ndpkt].fl32[0] = (float)(i % 2 ? tw - 8 : 8) / (float)tw;
+            pbuf[ndpkt].fl32[1] = (float)(i / 2 ? th - 8 : 8) / (float)th;
+            pbuf[ndpkt].fl32[2] = 0;
+            pbuf[ndpkt++].fl32[3] = 0;
 
-            pbuf[ndpkt].ui32[0] = i % 2 ? tw - 8 : 8;
-            pbuf[ndpkt].ui32[1] = i / 2 ? th - 8 : 8;
-            pbuf[ndpkt].ui32[2] = 0;
-            pbuf[ndpkt++].ui32[3] = 0;
+            pbuf[ndpkt].fl32[0] = (float)mr/128.0f;
+            pbuf[ndpkt].fl32[1] = (float)mg/128.0f;
+            pbuf[ndpkt].fl32[2] = (float)mb/128.0f;
+            pbuf[ndpkt++].fl32[3] = (arate * 96.0f)/128.0f;
 
-            pbuf[ndpkt].ui32[0] = ivec[i][0];
-            pbuf[ndpkt].ui32[1] = ivec[i][1];
-            pbuf[ndpkt].ui32[2] = ec->z;
-            pbuf[ndpkt++].ui32[3] = i > 1 ? 0 : 0x8000;
+            pbuf[ndpkt].fl32[0] = ivec[i][0];
+            pbuf[ndpkt].fl32[1] = ivec[i][1];
+            pbuf[ndpkt].fl32[2] = ivec[i][2];
+            pbuf[ndpkt++].fl32[3] = 1.0f;
         }
+
+        MikuPan_RenderSprite3D((sceGsTex0*)&tx0, buf);
+
+        //for (i = 0; i < 4; i++)
+        //{
+        //    pbuf[ndpkt].ui32[0] = mr;
+        //    pbuf[ndpkt].ui32[1] = mg;
+        //    pbuf[ndpkt].ui32[2] = mb;
+        //    pbuf[ndpkt++].ui32[3] = arate * 96.0f;
+        //    pbuf[ndpkt].ui32[0] = i % 2 ? tw - 8 : 8;
+        //    pbuf[ndpkt].ui32[1] = i / 2 ? th - 8 : 8;
+        //    pbuf[ndpkt].ui32[2] = 0;
+        //    pbuf[ndpkt++].ui32[3] = 0;
+        //    pbuf[ndpkt].ui32[0] = ivec[i][0];
+        //    pbuf[ndpkt].ui32[1] = ivec[i][1];
+        //    pbuf[ndpkt].ui32[2] = ec->z;
+        //    pbuf[ndpkt++].ui32[3] = i > 1 ? 0 : 0x8000;
+        //}
     }
 
     if (ec->dat.uc8[1] & 1)

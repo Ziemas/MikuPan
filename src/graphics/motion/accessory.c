@@ -359,7 +359,7 @@ void acsCalcCoordinate(SgCOORDUNIT* cp, u_int block_num, FURN_WRK* f_wrk, ROPE_C
     sceVu0FVECTOR x = {1.0f, 0.0f, 0.0f, 0.0f};
     sceVu0FVECTOR y = {0.0f, 1.0f, 0.0f, 0.0f};
     sceVu0FVECTOR z = {0.0f, 0.0f, 1.0f, 0.0f};
-    sceVu0FMATRIX base;
+    sceVu0FMATRIX base = {0};
 
     sceVu0UnitMatrix(base);
 
