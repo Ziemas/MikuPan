@@ -345,6 +345,35 @@ void sceVu0RotTransPers(sceVu0IVECTOR v0, sceVu0FMATRIX m0, sceVu0FVECTOR v1, in
     }
 }
 
+void sceVu0RotTransPersF(sceVu0FVECTOR v0, sceVu0FMATRIX m0, sceVu0FVECTOR v1, int mode)
+{
+    vec4 tmp = {0};
+
+    tmp[0] = m0[0][0] * v1[0] + m0[1][0] * v1[1] + m0[2][0] * v1[2] + m0[3][0] * v1[3];
+    tmp[1] = m0[0][1] * v1[0] + m0[1][1] * v1[1] + m0[2][1] * v1[2] + m0[3][1] * v1[3];
+    tmp[2] = m0[0][2] * v1[0] + m0[1][2] * v1[1] + m0[2][2] * v1[2] + m0[3][2] * v1[3];
+    tmp[3] = m0[0][3] * v1[0] + m0[1][3] * v1[1] + m0[2][3] * v1[2] + m0[3][3] * v1[3];
+
+    tmp[0] *= 1.0f / tmp[3];
+    tmp[1] *= 1.0f / tmp[3];
+    tmp[2] *= 1.0f / tmp[3];
+
+    if (mode == 0)
+    {
+        v0[0] = (tmp[0]);
+        v0[1] = (tmp[1]);
+        v0[2] = (tmp[2]);
+        v0[3] = (tmp[3]);
+    }
+    else
+    {
+        v0[0] = (tmp[0]);
+        v0[1] = (tmp[1]);
+        v0[2] = (tmp[2]);
+        v0[3] = (tmp[3]);
+    }
+}
+
 void sceVu0ScaleVector(sceVu0FVECTOR v0, sceVu0FVECTOR v1, float s)
 {
     glm_vec4_scale(v1, s, v0);

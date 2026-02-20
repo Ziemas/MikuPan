@@ -31,5 +31,6 @@ void sceVu0DivVector(sceVu0FVECTOR v0, sceVu0FVECTOR v1, float q);
 void sceVu0DivVectorXYZ(sceVu0FVECTOR v0, sceVu0FVECTOR v1, float q);
 void sceVu0ClampVector(sceVu0FVECTOR v0, sceVu0FVECTOR v1, float min, float max);
 void sceVu0InterVector(sceVu0FVECTOR v0, sceVu0FVECTOR v1, sceVu0FVECTOR v2, float r);
+void sceVu0RotTransPersF(sceVu0FVECTOR v0, sceVu0FMATRIX m0, sceVu0FVECTOR v1, int mode);
 
 #endif // SCE_LIBVU0_H

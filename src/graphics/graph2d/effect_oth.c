@@ -3562,27 +3562,29 @@ void SetDust(EFFECT_CONT *ec)
         sceVu0RotMatrixX(wlm, wlm, rot_x);
         sceVu0RotMatrixY(wlm, wlm, rot_y);
         sceVu0TransMatrix(wlm, wlm, wpos);
-        sceVu0MulMatrix(slm, SgWSMtx, wlm);
+        sceVu0MulMatrix(slm, *(sceVu0FMATRIX*)MikuPan_GetWorldScreenMatrix(), wlm);
+        //sceVu0MulMatrix(slm, SgWSMtx, wlm);
 
         w = 0;
 
         for (i = 0; i < 4; i++)
         {
-            sceVu0RotTransPers(eff_dust[n].ivec[i], slm, ppos[i], 0);
+            //sceVu0RotTransPers(eff_dust[n].ivec[i], slm, ppos[i], 0);
+            sceVu0RotTransPersF(eff_dust[n].ivec[i], slm, ppos[i], 0);
 
             if (eff_dust[n].ivec[i][0] < 0x4000 || eff_dust[n].ivec[i][0] > 0xc000)
             {
-                w = 1;
+                //w = 1;
             }
 
             if (eff_dust[n].ivec[i][1] < 0x4000 || eff_dust[n].ivec[i][1] > 0xc000)
             {
-                w = 1;
+                //w = 1;
             }
 
             if (eff_dust[n].ivec[i][2] < 0xff || eff_dust[n].ivec[i][2] > 0x00ffffff)
             {
-                w = 1;
+                //w = 1;
             }
         }
 
@@ -3628,27 +3630,29 @@ void SetDust(EFFECT_CONT *ec)
         sceVu0RotMatrixX(wlm, wlm, rot_x);
         sceVu0RotMatrixY(wlm, wlm, rot_y);
         sceVu0TransMatrix(wlm, wlm, wpos);
-        sceVu0MulMatrix(slm, SgWSMtx, wlm);
+        sceVu0MulMatrix(slm, *(sceVu0FMATRIX*)MikuPan_GetWorldScreenMatrix(), wlm);
+        //sceVu0MulMatrix(slm, SgWSMtx, wlm);
 
         w = 0;
 
         for (i = 0; i < 4; i++)
         {
-            sceVu0RotTransPers(eff_dust[n].ivec[i], slm, ppos[i], 0);
+            //sceVu0RotTransPers(eff_dust[n].ivec[i], slm, ppos[i], 0);
+            sceVu0RotTransPersF(eff_dust[n].ivec[i], slm, ppos[i], 0);
 
             if (eff_dust[n].ivec[i][0] < 0x4000 || eff_dust[n].ivec[i][0] > 0xc000)
             {
-                w = 1;
+                //w = 1;
             }
 
             if (eff_dust[n].ivec[i][1] < 0x4000 || eff_dust[n].ivec[i][1] > 0xc000)
             {
-                w = 1;
+                //w = 1;
             }
 
             if (eff_dust[n].ivec[i][2] < 0xff || eff_dust[n].ivec[i][2] > 0x00ffffff)
             {
-                w = 1;
+                //w = 1;
             }
         }
 
@@ -3719,23 +3723,43 @@ void SetDust(EFFECT_CONT *ec)
                     | SCE_GS_UV    << (4 * 1)
                     | SCE_GS_XYZF2 << (4 * 2);
 
+            float* buf = (float*)&pbuf[ndpkt];
+
             for (i = 0; i < 4; i++)
             {
-                pbuf[ndpkt].ui32[0] = mr;
-                pbuf[ndpkt].ui32[1] = mg;
-                pbuf[ndpkt].ui32[2] = mb;
-                pbuf[ndpkt++].ui32[3] = eff_dust[k].alp;
+                pbuf[ndpkt].fl32[0] = (float)((i & 1) != 0 ? tw - 8 : 8) / (float)tw;
+                pbuf[ndpkt].fl32[1] = (float)((i / 2) != 0 ? th - 8 : 8) / (float)th;
+                pbuf[ndpkt].fl32[2] = 0;
+                pbuf[ndpkt++].fl32[3] = 0;
 
-                pbuf[ndpkt].ui32[0] = (i & 1) != 0 ? tw - 8 : 8;
-                pbuf[ndpkt].ui32[1] = (i / 2) != 0 ? th - 8 : 8;
-                pbuf[ndpkt].ui32[2] = 0;
-                pbuf[ndpkt++].ui32[3] = 0;
+                pbuf[ndpkt].fl32[0] = (float)mr/255.0f;
+                pbuf[ndpkt].fl32[1] = (float)mg/255.0f;
+                pbuf[ndpkt].fl32[2] = (float)mb/255.0f;
+                pbuf[ndpkt++].fl32[3] = (float)eff_dust[k].alp/128.0f;
 
-                pbuf[ndpkt].ui32[0] = eff_dust[k].ivec[i][0];
-                pbuf[ndpkt].ui32[1] = eff_dust[k].ivec[i][1];
-                pbuf[ndpkt].ui32[2] = eff_dust[k].ivec[i][2];
-                pbuf[ndpkt++].ui32[3] = i > 1 ? 0 : 0x8000;
+                pbuf[ndpkt].fl32[0] = eff_dust[k].ivec[i][0];
+                pbuf[ndpkt].fl32[1] = eff_dust[k].ivec[i][1];
+                pbuf[ndpkt].fl32[2] = eff_dust[k].ivec[i][2];
+                pbuf[ndpkt++].fl32[3] = 1.0f;
             }
+
+            MikuPan_RenderSprite3D((sceGsTex0*)&tx0, buf);
+
+            //for (i = 0; i < 4; i++)
+            //{
+            //    pbuf[ndpkt].ui32[0] = mr;
+            //    pbuf[ndpkt].ui32[1] = mg;
+            //    pbuf[ndpkt].ui32[2] = mb;
+            //    pbuf[ndpkt++].ui32[3] = eff_dust[k].alp;
+            //    pbuf[ndpkt].ui32[0] = (i & 1) != 0 ? tw - 8 : 8;
+            //    pbuf[ndpkt].ui32[1] = (i / 2) != 0 ? th - 8 : 8;
+            //    pbuf[ndpkt].ui32[2] = 0;
+            //    pbuf[ndpkt++].ui32[3] = 0;
+            //    pbuf[ndpkt].ui32[0] = eff_dust[k].ivec[i][0];
+            //    pbuf[ndpkt].ui32[1] = eff_dust[k].ivec[i][1];
+            //    pbuf[ndpkt].ui32[2] = eff_dust[k].ivec[i][2];
+            //    pbuf[ndpkt++].ui32[3] = i > 1 ? 0 : 0x8000;
+            //}
         }
 
         pbuf[c].ui32[0] = ndpkt + DMAend - c - 1;
@@ -4214,7 +4238,8 @@ void RunLeafSub(EFF_LEAF *lep)
     u_long tx0;
     float rot_x;
     float rot_y;
-    sceVu0IVECTOR ivec[16][5];
+    //sceVu0IVECTOR ivec[16][5];
+    sceVu0FVECTOR ivec[16][5];
     sceVu0FMATRIX wlm;
     sceVu0FMATRIX slm;
     sceVu0FVECTOR bpos;
@@ -4312,11 +4337,13 @@ void RunLeafSub(EFF_LEAF *lep)
         }
 
         sceVu0TransMatrix(wlm, wlm, wpos);
-        sceVu0MulMatrix(slm, SgWSMtx, wlm);
+        sceVu0MulMatrix(slm, *(sceVu0FMATRIX*)MikuPan_GetWorldScreenMatrix(), wlm);
+        //sceVu0MulMatrix(slm, SgWSMtx, wlm);
 
         for (j = 0, w = 0; j < 5; j++)
         {
-            sceVu0RotTransPers(ivec[i][j], slm, ppos[lep->type][j], 0);
+            //sceVu0RotTransPers(ivec[i][j], slm, ppos[lep->type][j], 0);
+            sceVu0RotTransPersF(ivec[i][j], slm, ppos[lep->type][j], 0);
 
             if (ivec[i][j][0] < 0x4000 || ivec[i][j][0] > 0xc000)
             {
@@ -4413,7 +4440,7 @@ void RunLeafSub(EFF_LEAF *lep)
         {
             k = so[j];
 
-            if (disp[k] != 0)
+            //if (disp[k] != 0)
             {
                 pbuf[ndpkt].ul64[0] = SCE_GIF_SET_TAG(4, SCE_GS_TRUE, SCE_GS_TRUE, SCE_GS_SET_PRIM(SCE_GS_PRIM_TRISTRIP, 1, 1, 0, 1, 0, 1, 0, 0), SCE_GIF_PACKED, 3);
                 pbuf[ndpkt++].ul64[1] = 0 \
@@ -4434,23 +4461,44 @@ void RunLeafSub(EFF_LEAF *lep)
                     bb = elo[k].b;
                 }
 
+                float* buf = (float*)&pbuf[ndpkt];
                 for (i = 0; i < 4; i++)
                 {
-                    pbuf[ndpkt].ui32[0] = rr;
-                    pbuf[ndpkt].ui32[1] = gg;
-                    pbuf[ndpkt].ui32[2] = bb;
-                    pbuf[ndpkt++].ui32[3] = elo[k].a;
+                    pbuf[ndpkt].fl32[0] = (float)(i & 1 ? tw - 8 : 8) / (float)tw;
+                    pbuf[ndpkt].fl32[1] = (float)(i / 2 ? th - 8 : 8) / (float)th;
+                    pbuf[ndpkt].fl32[2] = 0;
+                    pbuf[ndpkt++].fl32[3] = 1.0f;
 
-                    pbuf[ndpkt].ui32[0] = i & 1 ? tw - 8 : 8;
-                    pbuf[ndpkt].ui32[1] = i / 2 ? th - 8 : 8;
-                    pbuf[ndpkt].ui32[2] = 0;
-                    pbuf[ndpkt++].ui32[3] = 0;
+                    pbuf[ndpkt].fl32[0] = (float)rr/255.0f;
+                    pbuf[ndpkt].fl32[1] = (float)gg/255.0f;
+                    pbuf[ndpkt].fl32[2] = (float)bb/255.0f;
+                    pbuf[ndpkt++].fl32[3] = (float)elo[k].a/128.0f;
 
-                    pbuf[ndpkt].ui32[0] = ivec[k][i][0];
-                    pbuf[ndpkt].ui32[1] = ivec[k][i][1];
-                    pbuf[ndpkt].ui32[2] = ivec[k][i][2];
-                    pbuf[ndpkt++].ui32[3] = i > 1 ? 0 : 0x8000;
+                    pbuf[ndpkt].fl32[0] = ivec[k][i][0];
+                    pbuf[ndpkt].fl32[1] = ivec[k][i][1];
+                    pbuf[ndpkt].fl32[2] = ivec[k][i][2];
+                    pbuf[ndpkt++].fl32[3] = 1.0f;
                 }
+
+                MikuPan_RenderSprite3D((sceGsTex0*)&tx0, buf);
+
+                //for (i = 0; i < 4; i++)
+                //{
+                //    pbuf[ndpkt].ui32[0] = rr;
+                //    pbuf[ndpkt].ui32[1] = gg;
+                //    pbuf[ndpkt].ui32[2] = bb;
+                //    pbuf[ndpkt++].ui32[3] = elo[k].a;
+                //
+                //    pbuf[ndpkt].ui32[0] = i & 1 ? tw - 8 : 8;
+                //    pbuf[ndpkt].ui32[1] = i / 2 ? th - 8 : 8;
+                //    pbuf[ndpkt].ui32[2] = 0;
+                //    pbuf[ndpkt++].ui32[3] = 0;
+                //
+                //    pbuf[ndpkt].ui32[0] = ivec[k][i][0];
+                //    pbuf[ndpkt].ui32[1] = ivec[k][i][1];
+                //    pbuf[ndpkt].ui32[2] = ivec[k][i][2];
+                //    pbuf[ndpkt++].ui32[3] = i > 1 ? 0 : 0x8000;
+                //}
             }
         }
     }

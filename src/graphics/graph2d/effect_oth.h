@@ -148,7 +148,8 @@ typedef struct { // 0x520
 typedef struct { // 0x80
 	float alp;
 	float cnt;
-	sceVu0IVECTOR ivec[4];
+	//sceVu0IVECTOR ivec[4];
+	sceVu0FVECTOR ivec[4];
 	sceVu0FVECTOR pos;
 	sceVu0FVECTOR vel;
 	sceVu0FVECTOR opos;
