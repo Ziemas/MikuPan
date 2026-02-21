@@ -3,18 +3,19 @@
 
 #include "typedefs.h"
 
-#include "main/glob.h"
 #include "ingame/map/furn_dat.h"
-#include "ingame/photo/photo.h"
+#include "ingame/photo/photo_types.h"
+#include "main/glob.h"
 
-
-typedef struct {
+typedef struct
+{
     u_char mode;
     u_char time;
     u_char req_no;
 } PWARP_WRK;
 
-typedef struct {
+typedef struct
+{
     u_char room;
     u_char floor;
     u_short pos_x;
@@ -90,7 +91,8 @@ void PhotoPointChkEne();
 void PhotoPointChkFurn();
 void PhotoPointChkRare();
 void PhotoPointCulcEne(ENE_WRK *ew, PHOTO_WRK *pw);
-void PhotoPointCulcFurn(FURN_WRK *fw, PHOTO_WRK *pw, float dist, float degree, u_int stts);
+void PhotoPointCulcFurn(FURN_WRK *fw, PHOTO_WRK *pw, float dist, float degree,
+                        u_int stts);
 void PhotoPointCulcRare(u_char wrk_no, PHOTO_WRK *pw, float dist, float degree);
 void PlyrMpRecoverChk(u_int recov);
 void PlyrFModeMoveCtrl();
@@ -108,7 +110,8 @@ void CngPlyrRotRapid(MOVE_BOX *mb, float rot0);
 void PlyrMovePadFind(MOVE_BOX *mb, sceVu0FVECTOR tv);
 float GetMovePad(u_char id);
 int MovePadEnableChk(u_char *dir_save);
-void PadInfoTmpSave(u_char *dir_save, u_char dir_now, float *rot_save, float rot_now);
+void PadInfoTmpSave(u_char *dir_save, u_char dir_now, float *rot_save,
+                    float rot_now);
 u_char PlyrMoveStaChk(float pad_chk);
 u_int PlyrLeverInputChk();
 u_char PlyrMoveHitChk(MOVE_BOX *mb, sceVu0FVECTOR tv, u_char id);
@@ -140,4 +143,4 @@ void PlayerWarpRoomLoadReq();
 int ShutterChanceChk();
 void PlayerWarpReq2(u_char dat_no);
 
-#endif // INGAME_PLYR_PLYR_CTL_H
+#endif// INGAME_PLYR_PLYR_CTL_H

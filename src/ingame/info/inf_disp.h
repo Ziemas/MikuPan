@@ -3,6 +3,7 @@
 
 #include "typedefs.h"
 #include "graphics/graph2d/sprt.h"
+#include "ingame/photo/photo_types.h"
 
 typedef struct {
     float frot_x;
