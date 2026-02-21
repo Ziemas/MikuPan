@@ -1,5 +1,6 @@
 #include "map_htck.h"
 #include "common.h"
+#include "enums.h"
 #include "typedefs.h"
 
 #include "ingame/map/door_ctl.h"// DoorCoverCheck
@@ -200,11 +201,11 @@ u_char HitChkSegment2All(sceVu0FVECTOR f, sceVu0FVECTOR t, float deg)
             }
             else
             {
-                room_no = GetDataRoom(6, room_id);
+                room_no = GetDataRoom(MAP_HIT_CHECK, room_id);
 
                 for (j = 0; j < tmp_hit_num; j++)
                 {
-                    if (PosInAreaJudge1(6, room_no, j, cmp_z, cmp_x) != 0)
+                    if (PosInAreaJudge1(MAP_HIT_CHECK, room_no, j, cmp_z, cmp_x) != 0)
                     {
                         return 1;
                     }
@@ -215,7 +216,7 @@ u_char HitChkSegment2All(sceVu0FVECTOR f, sceVu0FVECTOR t, float deg)
                     return 2;
                 }
 
-                room_no = GetDataRoom(11, room_id);
+                room_no = GetDataRoom(MAP_FURNITUR, room_id);
 
                 if (FurnCoverCheck(cmp_x, cmp_y, cmp_z, room_no) != 0)
                 {
@@ -268,17 +269,17 @@ u_char HitChkSegment2All2D(sceVu0FVECTOR f, sceVu0FVECTOR t, float deg)
         {
             if (room_id != 0xff)
             {
-                room_no = GetDataRoom(6, room_id);
+                room_no = GetDataRoom(MAP_HIT_CHECK, room_id);
 
                 for (j = 0; j < room_wrk.hit_num; j++)
                 {
-                    if (PosInAreaJudge1(6, room_no, j, cmp_z, cmp_x) != 0)
+                    if (PosInAreaJudge1(MAP_HIT_CHECK, room_no, j, cmp_z, cmp_x) != 0)
                     {
                         return 1;
                     }
                 }
 
-                room_no = GetDataRoom(11, room_id);
+                room_no = GetDataRoom(MAP_FURNITUR, room_id);
 
                 if (FurnCoverCheck(cmp_x, cmp_y, cmp_z, room_no) != 0)
                 {

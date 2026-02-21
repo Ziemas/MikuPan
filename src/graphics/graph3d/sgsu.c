@@ -509,7 +509,7 @@ void SetVUMeshDataPost(u_int *prim)
             FlushModel(0);
             break;
         default:
-            printf("Illegal Packet %d\n", mtype);
+            info_log("Illegal Packet %d\n", mtype);
             break;
     }
 }

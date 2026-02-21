@@ -2068,7 +2068,7 @@ void gra3dDraw()
         {
             SetWScissorBox(disp_room);
 
-            if (disp_room != 8 || !(plyr_wrk.move_box.pos[1] > -300.0f))
+            if (disp_room != R008_KAIROU || !(plyr_wrk.move_box.pos[1] > -300.0f))
             {
                 MirrorDraw(&camera, room_addr_tbl[disp_room].near_sgd, SceneSortUnit);
 
@@ -2086,7 +2086,7 @@ void gra3dDraw()
         {
             if (
                 ((HeaderSection *)room_addr_tbl[disp_room].near_sgd)->kind & 2 &&
-                disp_room != 26 && disp3d_mirror != 0
+                disp_room != RO26_OYASHIRO && disp3d_mirror != 0
             )
             {
                 MirrorDraw(&camera, room_addr_tbl[disp_room].near_sgd, SceneSortUnit);

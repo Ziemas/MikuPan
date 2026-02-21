@@ -315,17 +315,16 @@ void LoadTRI2Files(u_int *prim)
         SGDTRI2FILEHEADER * tri2 = (SGDTRI2FILEHEADER *) prim;
         tri2size = *(u_short *)(prim + 3);
 
-        //info_log("GS upload request for DBP %x DPSM %x X: %d Y: %d",
-        //          (int) tri2->gsli.bitbltbuf.DBP,
-        //          (int) tri2->gsli.bitbltbuf.DPSM,
-        //          (int) tri2->gsli.trxreg.RRW,
-        //          (int) tri2->gsli.trxreg.RRH);
         GsUpload(&tri2->gsli, (u_char*)&tri2[1]);
 
-        uint8_t* img = (uint8_t*)&tri2[1];
-        sceGsLoadImage* image_load = (sceGsLoadImage*)&img[tri2->gsli.giftag1.NLOOP * 0x10];
-        uint8_t* image_color_data = (uint8_t*)(&image_load[1]);
-        GsUpload(image_load, image_color_data);
+        /// Need to upload the clut data too, only if it is not PSMCT32
+        if (tri2->gsli.bitbltbuf.DPSM != 0 /* PSMCT32 */)
+        {
+            uint8_t* img = (uint8_t*)&tri2[1];
+            sceGsLoadImage* image_load = (sceGsLoadImage*)&img[tri2->gsli.giftag1.NLOOP * 0x10];
+            uint8_t* image_color_data = (uint8_t*)(&image_load[1]);
+            GsUpload(image_load, image_color_data);
+        }
 
         AppendDmaTag((int64_t)prim, tri2size + 1);
 
@@ -383,6 +382,8 @@ void RebuildTRI2Files(u_int *prim)
         return;
     }
 
+    /// PC port does not need to reconvert textures for a more efficient
+    /// GS Upload
     return;
 
     InitialDmaBuffer();

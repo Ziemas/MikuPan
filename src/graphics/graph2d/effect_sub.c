@@ -226,7 +226,6 @@ void SetSquare2s(int pri, float x1, float y1, float x4, float y4, u_char r1, u_c
 
     float w = x4 - x1;
     float h = y4 - y1;
-    // x, y, x + w, y, x, y + h, x + w, y + h
     //MikuPan_RenderSquare(x1, y1, 0, 0, 0, 0, x4, y4, r1, g1, b1, a);
     
     pbuf[ndpkt].ul128 = (u_long128)0;
@@ -2315,9 +2314,8 @@ void CaptureScreen(u_int addr)
 
 void DrawScreen(u_int pri, u_int addr, u_char r, u_char g, u_char b, u_char a)
 {
-    DISP_SPRT ds;
-    
-    
+    DISP_SPRT ds = {0};
+
     SPRT_DAT sd =
     {
         .tex0 = 0,

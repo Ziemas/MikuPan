@@ -20,6 +20,7 @@
 #include "ingame/menu/sp_menu.h"
 #include "ingame/plyr/unit_ctl.h"
 #include "main/glob.h"
+#include "mikupan/mikupan_utils.h"
 #include "mikupan/rendering/mikupan_renderer.h"
 #include "os/eeiop/cdvd/eecdvd.h"
 #include "os/eeiop/eese.h"
@@ -490,10 +491,10 @@ void SetEffSQTex(int n, float *v, int tp, float w, float h, u_char r, u_char g, 
         pbuf[ndpkt].fl32[2] = 0;
         pbuf[ndpkt++].fl32[3] = 0;
 
-        pbuf[ndpkt].fl32[0] = (float)rr/255.0f;
-        pbuf[ndpkt].fl32[1] = (float)gg/255.0f;
-        pbuf[ndpkt].fl32[2] = (float)bb/255.0f;
-        pbuf[ndpkt++].fl32[3] = (float)a/128.0f;
+        pbuf[ndpkt].fl32[0] = MikuPan_ConvertScaleColor(rr);
+        pbuf[ndpkt].fl32[1] = MikuPan_ConvertScaleColor(gg);
+        pbuf[ndpkt].fl32[2] = MikuPan_ConvertScaleColor(bb);
+        pbuf[ndpkt++].fl32[3] = MikuPan_ConvertScaleColor(a);
 
         pbuf[ndpkt].fl32[0] = ((float)(xx[i % 2] - 2048.0f) / 2048.0f) * 2.0f - 1.0f;
         pbuf[ndpkt].fl32[1] = 1.0f - ((float)(yy[i / 2] - 2048.0f) / 2048.0f) * 2.0f;
@@ -3755,10 +3756,10 @@ void SetDust(EFFECT_CONT *ec)
                 pbuf[ndpkt].fl32[2] = 0;
                 pbuf[ndpkt++].fl32[3] = 0;
 
-                pbuf[ndpkt].fl32[0] = (float)mr/255.0f;
-                pbuf[ndpkt].fl32[1] = (float)mg/255.0f;
-                pbuf[ndpkt].fl32[2] = (float)mb/255.0f;
-                pbuf[ndpkt++].fl32[3] = (float)eff_dust[k].alp/128.0f;
+                pbuf[ndpkt].fl32[0] = MikuPan_ConvertScaleColor(mr);
+                pbuf[ndpkt].fl32[1] = MikuPan_ConvertScaleColor(mg);
+                pbuf[ndpkt].fl32[2] = MikuPan_ConvertScaleColor(mb);
+                pbuf[ndpkt++].fl32[3] = MikuPan_ConvertScaleColor(eff_dust[k].alp);
 
                 pbuf[ndpkt].fl32[0] = eff_dust[k].ivec[i][0];
                 pbuf[ndpkt].fl32[1] = eff_dust[k].ivec[i][1];
@@ -3886,7 +3887,7 @@ void SetWaterdrop(EFFECT_CONT *ec)
 
                 SetEffects(0x16, 8, 1, (u_int)(vu0Rand() * 16.0f) + 8, 0x20, 0x20, 0x30, 0.3f, 4.5f, wwpos[wwcnt], dummy_rot, 2);
 
-                if (plyr_wrk.pr_info.room_no == 23)
+                if (plyr_wrk.pr_info.room_no == R023_IKESU)
                 {
                     SeStartPosEventFlame(plyr_wrk.pr_info.room_no, 0, wwpos[wwcnt], 0, 0x1000, 0x1000);
                 }
@@ -3909,7 +3910,7 @@ void SetWaterdrop(EFFECT_CONT *ec)
 
                 SetEffects(0x16, 8, 0x81, 0x10, 0x40, 0, 0, 0.002f, 0.3f, wwpos[wwcnt], dummy_rot, 1);
 
-                if (plyr_wrk.pr_info.room_no == 1 || plyr_wrk.pr_info.room_no == 26)
+                if (plyr_wrk.pr_info.room_no == R001_FUSUMA || plyr_wrk.pr_info.room_no == RO26_OYASHIRO)
                 {
                     SeStartPosEventFlame(plyr_wrk.pr_info.room_no, 0x0, wwpos[wwcnt], 0, 0x1000, 0x1000);
                 }
@@ -3939,7 +3940,7 @@ void SetWaterdrop(EFFECT_CONT *ec)
             {
                 SetEffects(0x16, 8, 1, (u_int)(vu0Rand() * 16.0f) + 8, 0x20, 0x20, 0x30, 0.3f, 4.5f, wwpos[wwcnt], dummy_rot, 2);
             }
-            if (plyr_wrk.pr_info.room_no == 0x17)
+            if (plyr_wrk.pr_info.room_no == R023_IKESU)
             {
                 SeStartPosEventFlame(plyr_wrk.pr_info.room_no, 0, wwpos[wwcnt], 0, 0x1000, 0x1000);
             }
@@ -4086,7 +4087,7 @@ void SetDustLeaf(sceVu0FVECTOR pos, int type)
 
     if (type == 0)
     {
-        if (plyr_wrk.pr_info.room_no == 21)
+        if (plyr_wrk.pr_info.room_no == R021_URANIWA)
         {
             mr = rgb1[0];
             mg = rgb1[1];
@@ -4492,10 +4493,10 @@ void RunLeafSub(EFF_LEAF *lep)
                     pbuf[ndpkt].fl32[2] = 0;
                     pbuf[ndpkt++].fl32[3] = 1.0f;
 
-                    pbuf[ndpkt].fl32[0] = (float)rr/255.0f;
-                    pbuf[ndpkt].fl32[1] = (float)gg/255.0f;
-                    pbuf[ndpkt].fl32[2] = (float)bb/255.0f;
-                    pbuf[ndpkt++].fl32[3] = (float)elo[k].a/128.0f;
+                    pbuf[ndpkt].fl32[0] = MikuPan_ConvertScaleColor(rr);
+                    pbuf[ndpkt].fl32[1] = MikuPan_ConvertScaleColor(bb);
+                    pbuf[ndpkt].fl32[2] = MikuPan_ConvertScaleColor(gg);
+                    pbuf[ndpkt++].fl32[3] = MikuPan_ConvertScaleColor(elo[k].a);
 
                     pbuf[ndpkt].fl32[0] = ivec[k][i][0];
                     pbuf[ndpkt].fl32[1] = ivec[k][i][1];
@@ -5234,7 +5235,7 @@ void SetCanal()
 {
     int i;
 
-    if (plyr_wrk.pr_info.room_no == 23)
+    if (plyr_wrk.pr_info.room_no == R023_IKESU)
     {
         for (i = 0; i < 3; i++)
         {
@@ -5412,7 +5413,7 @@ void SetFirefly()
     sceVu0FMATRIX mtx;
     FIREFLY *ffp;
 
-    if (plyr_wrk.pr_info.room_no == 22)
+    if (plyr_wrk.pr_info.room_no == R022_NAKASU)
     {
         if (stop_effects == 0 && wait == 0)
         {
@@ -5480,7 +5481,8 @@ void SetSky()
     float fx;
     float fz;
     float l;
-    sceVu0IVECTOR ivec;
+    sceVu0FVECTOR ivec;
+    //sceVu0IVECTOR ivec;
     sceVu0FVECTOR cpos;
     sceVu0FVECTOR rot;
     float length;
@@ -5510,9 +5512,9 @@ void SetSky()
     sc_speed = 6.0f;
 
     if (
-        plyr_wrk.pr_info.room_no == 0x10 || plyr_wrk.pr_info.room_no == 0x16 ||
-        plyr_wrk.pr_info.room_no == 0x15 || plyr_wrk.pr_info.room_no == 0x18 ||
-        plyr_wrk.pr_info.room_no == 0x26 || plyr_wrk.pr_info.room_no == 0x19
+        plyr_wrk.pr_info.room_no == R016_NAKANIWA || plyr_wrk.pr_info.room_no == R022_NAKASU ||
+        plyr_wrk.pr_info.room_no == R021_URANIWA || plyr_wrk.pr_info.room_no == R024_TSUKIMI ||
+        plyr_wrk.pr_info.room_no == R038_TYOUBOU || plyr_wrk.pr_info.room_no == R025_SANDO
     )
     {
         fx = (camera.i[0] - camera.p[0]) * (camera.i[0] - camera.p[0]);
@@ -5525,7 +5527,8 @@ void SetSky()
         cpos[2] = camera.p[2] + ((camera.i[2] - camera.p[2]) * length) / l;
         cpos[3] = 1.0f;
 
-        sceVu0RotTransPers(ivec, SgWSMtx, cpos, 0);
+        sceVu0RotTransPersF(ivec, *(sceVu0FMATRIX*)MikuPan_GetWorldScreenMatrix(), cpos, 0);
+        //sceVu0RotTransPers(ivec, SgWSMtx, cpos, 0);
 
         clip = 0;
 
@@ -5561,7 +5564,7 @@ void SetSky()
             y2 = ivec[1] - (hline * 16);
 
             { // MACRO ?
-            sceVu0IVECTOR ivec;
+            sceVu0IVECTOR ivec = {0};
             ((float *)ivec)[0] = height;
             ((float *)ivec)[1] = height + 639.0f;
             _ftoi4(ivec, (float *)ivec);
@@ -5621,7 +5624,7 @@ void SetSky()
             pbuf[ndpkt].ui32[2] = 0;
             pbuf[ndpkt++].ui32[3] = 0;
 
-            /// XYZ
+            /// XYZF2
             pbuf[ndpkt].ui32[0] = x1;
             pbuf[ndpkt].ui32[1] = y1;
             pbuf[ndpkt].ui32[2] = 0;
@@ -5633,7 +5636,7 @@ void SetSky()
             pbuf[ndpkt].ui32[2] = 0;
             pbuf[ndpkt++].ui32[3] = 0;
 
-            /// XYZ
+            /// XYZF2
             pbuf[ndpkt].ui32[0] = x2;
             pbuf[ndpkt].ui32[1] = y2;
             pbuf[ndpkt].ui32[2] = 0;
@@ -5692,7 +5695,7 @@ void SetPond()
     far = 5500.0f;
     near = 2000.0f;
 
-    if (plyr_wrk.pr_info.room_no != 22 || EnemyUseJudge(0) != 0)
+    if (plyr_wrk.pr_info.room_no != R022_NAKASU || EnemyUseJudge(0) != 0)
     {
         return;
     }
@@ -5916,7 +5919,7 @@ void SetHaze_Pond()
     static HAZE_NUMS hn[10];
     long v2;
 
-    if ((plyr_wrk.pr_info.room_no != 0x16 && plyr_wrk.pr_info.room_no != 0x10) || realtime_scene_flg != 0 || init_haze_pond == 0)
+    if ((plyr_wrk.pr_info.room_no != R022_NAKASU && plyr_wrk.pr_info.room_no != R016_NAKANIWA) || realtime_scene_flg != 0 || init_haze_pond == 0)
     {
         return;
     }
@@ -7059,31 +7062,31 @@ void SetSaveCameraLamp()
     float pos1 = 128.0f;
     float pos2 = 20.0f;
 
-    if (plyr_wrk.pr_info.room_no == 0)
+    if (plyr_wrk.pr_info.room_no == R000_GENKAN)
     {
         n = 0;
     }
-    else if (plyr_wrk.pr_info.room_no == 15)
+    else if (plyr_wrk.pr_info.room_no == R015_KOUJI)
     {
         n = 1;
     }
-    else if (plyr_wrk.pr_info.room_no == 21)
+    else if (plyr_wrk.pr_info.room_no == R021_URANIWA)
     {
         n = 2;
     }
-    else if (plyr_wrk.pr_info.room_no == 41)
+    else if (plyr_wrk.pr_info.room_no == R041_HIKAE)
     {
         n = 3;
     }
-    else if (plyr_wrk.pr_info.room_no == 6)
+    else if (plyr_wrk.pr_info.room_no == R006_HAKONIWA)
     {
         n = 4;
     }
-    else if (plyr_wrk.pr_info.room_no == 14)
+    else if (plyr_wrk.pr_info.room_no == R014)
     {
         n = 5;
     }
-    else if (plyr_wrk.pr_info.room_no == 31)
+    else if (plyr_wrk.pr_info.room_no == R031)
     {
         n = 6;
     }

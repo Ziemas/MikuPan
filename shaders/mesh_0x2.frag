@@ -5,9 +5,19 @@ in vec4 vNormal;
 out vec4 FragColor;
 
 uniform sampler2D uTexture;
+uniform int renderNormals;
 
 void main()
 {
-    vec4 tex = texture(uTexture, vUV);
-    FragColor = vec4(tex.rgb, tex.a);
+    if (renderNormals == 1)
+    {
+        FragColor = normalize(vNormal);
+    }
+    else
+    {
+        vec3 lightDir = normalize(vec3(0.3, 0.7, 0.6));
+        float ndl = max(dot(normalize(vNormal), -lightDir), 0.0);
+        vec4 tex = texture(uTexture, vUV);
+        FragColor = vec4(tex.rgb, tex.a);
+    }
 }

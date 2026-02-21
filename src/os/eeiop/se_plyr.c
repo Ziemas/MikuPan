@@ -34,7 +34,7 @@ int SeReqFootStep(sceVu0FVECTOR pos)
     
     px = pos[0];
     pz = pos[2];
-    room_no = GetDataRoom(8, plyr_wrk.pr_info.room_no);
+    room_no = GetDataRoom(MAP_REQ_SE, plyr_wrk.pr_info.room_no);
     call_no = 0;
     
     for (i = 0; i < room_wrk.se_num; i++)
@@ -150,15 +150,15 @@ u_char IsKarehaZone(sceVu0FVECTOR pos)
     pz = pos[0];
     px = pos[2];
 
-    room_no = GetDataRoom(8, plyr_wrk.pr_info.room_no);
+    room_no = GetDataRoom(MAP_REQ_SE, plyr_wrk.pr_info.room_no);
     
     call_no = 0;
     
     for (i = 0; i < room_wrk.se_num; i++)
     {
-        if (PosInAreaJudge1(8, room_no, i, px, pz))
+        if (PosInAreaJudge1(MAP_REQ_SE, room_no, i, px, pz))
         {
-            addr = (u_int *)MikuPan_GetHostAddress(((int *)map_wrk.dat_adr)[8] + DVD_DATA_ADDR);
+            addr = (u_int *)MikuPan_GetHostAddress(((int *)map_wrk.dat_adr)[MAP_REQ_SE] + DVD_DATA_ADDR);
             addr = (u_int *)MikuPan_GetHostAddress((++addr)[room_no] + DVD_DATA_ADDR);
             addr = (u_int *)MikuPan_GetHostAddress((++addr)[i] + DVD_DATA_ADDR);
 
@@ -183,15 +183,15 @@ u_char IsTakenohaZone(sceVu0FVECTOR pos)
     pz = pos[0];
     px = pos[2];
 
-    room_no = GetDataRoom(8, plyr_wrk.pr_info.room_no);
+    room_no = GetDataRoom(MAP_REQ_SE, plyr_wrk.pr_info.room_no);
     
     call_no = 0;
     
     for (i = 0; i < room_wrk.se_num; i++)
     {
-        if (PosInAreaJudge1(8, room_no, i, px, pz))
+        if (PosInAreaJudge1(MAP_REQ_SE, room_no, i, px, pz))
         {
-            addr = (u_int *)MikuPan_GetHostAddress(((int *)map_wrk.dat_adr)[8] + DVD_DATA_ADDR);
+            addr = (u_int *)MikuPan_GetHostAddress(((int *)map_wrk.dat_adr)[MAP_REQ_SE] + DVD_DATA_ADDR);
             addr = (u_int *)MikuPan_GetHostAddress((++addr)[room_no] + DVD_DATA_ADDR);
             addr = (u_int *)MikuPan_GetHostAddress((++addr)[i] + DVD_DATA_ADDR);
 
@@ -206,5 +206,5 @@ u_char IsTakenohaZone(sceVu0FVECTOR pos)
 
 u_char IsHokoriZone()
 {
-    return plyr_wrk.pr_info.room_no == 0x9;
+    return plyr_wrk.pr_info.room_no == R009_NANDO;
 }

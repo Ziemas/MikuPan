@@ -10,6 +10,7 @@
 #include "ingame/map/map_ctrl.h"
 #include "ingame/map/rotd_ctl.h"
 // #include "ingame/plyr/unit_ctl.h" // RotLimitChk
+#include "enums.h"
 #include "ingame/plyr/unit_ctl.h"
 #include "main/glob.h"
 
@@ -55,7 +56,7 @@ void ChangeRotDoorFace(u_short door_id)
 
     dkeepp = &door_keep[door_id];
 
-    room_no = GetDataRoom(0, dkeepp->room_id);
+    room_no = GetDataRoom(MAP_ROOM_DAT, dkeepp->room_id);
 
     next_room_id = GetNextRIdFromRNoDId(room_no, door_id);
 
@@ -87,7 +88,7 @@ void ChangeRotDoorFaceRoomId(u_short door_id, u_char room_id)
         return;
     }
 
-    room_no = GetDataRoom(0x0, dkeepp->room_id);
+    room_no = GetDataRoom(MAP_ROOM_DAT, dkeepp->room_id);
 
     next_room_id = GetNextRIdFromRNoDId(room_no, door_id);
 

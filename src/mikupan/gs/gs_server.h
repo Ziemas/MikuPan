@@ -132,7 +132,7 @@ class GSHelper
                                             int cbw, int csa, char alpha_reg);
     void Clear();
 
-   public:
+   private:
     std::vector<char> mem_;
 };
 }// namespace GS

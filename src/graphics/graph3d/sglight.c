@@ -1241,7 +1241,10 @@ void SgReadLights(void *sgd_top, void *light_top, float *Ambient,
         Slight->num = 0;
     }
 
-    Vu0ZeroVector(Ambient);
+    if (Ambient != NULL)
+    {
+        Vu0ZeroVector(Ambient);
+    }
 
     //prim = (u_int *)*pk;
     prim = (u_int *) MikuPan_GetHostPointer((int) *pk);
@@ -1579,7 +1582,7 @@ void SetPreRenderTYPE2(int gloops, u_int *prim)
 
                 if (dbg_flg != 0)
                 {
-                    printf("%f %f %f\n", pcol[0], pcol[1], pcol[2]);
+                    info_log("%f %f %f", pcol[0], pcol[1], pcol[2]);
                 }
 
                 ((float *) prim)[0] = pcol[0];
@@ -2034,8 +2037,6 @@ void ClearPreRenderMeshData(u_int *prim)
             break;
         case 0x12:
         case 0x32:
-            //MikuPan_RenderMeshType0x32((struct SGDPROCUNITHEADER *) vuvnprim, (struct SGDPROCUNITHEADER *) prim);
-
             for (j = 0; j < gloops; j++)
             {
                 prim = GetNextUnpackAddr(prim);

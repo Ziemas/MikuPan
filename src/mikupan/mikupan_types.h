@@ -288,7 +288,6 @@ struct SGDVUMESHSTREGSET
     u_int auiVifCode[3];
 };
 
-
 struct SGDVUMESHPOINTNUM
 {
     struct G3DVIF1CODE_UNPACK VifUnpack;

@@ -1,4 +1,5 @@
 #include "mirror.h"
+#include "cglm/mat4.h"
 #include "cglm/vec4.h"
 #include "common.h"
 #include "typedefs.h"
@@ -504,6 +505,7 @@ int MakeMirrorEnvironment(u_int *prim)
     switch (mtype)
     {
         case 0x12:
+            MikuPan_RenderMeshType0x32((struct SGDPROCUNITHEADER *)vuvnprim, (struct SGDPROCUNITHEADER *)prim);
             vp = (float *) &vuvnprim[14];
 
             for (j = 0; j < gloops; j++)
@@ -529,8 +531,6 @@ int MakeMirrorEnvironment(u_int *prim)
                 vp += 12;
                 sgn = 1.0f;
 
-                //MikuPan_RenderVertices(vp, loops);
-
                 for (i = 0; i < loops; i++)
                 {
                     if (prim[0] != 1)
@@ -555,8 +555,7 @@ int MakeMirrorEnvironment(u_int *prim)
             }
             break;
         case 0x32:
-            //MikuPan_RenderMeshType0x32((struct SGDPROCUNITHEADER *) vuvnprim,
-            //                           (struct SGDPROCUNITHEADER *) prim);
+            MikuPan_RenderMeshType0x32((struct SGDPROCUNITHEADER *) vuvnprim, (struct SGDPROCUNITHEADER *) prim);
             vp = (float *) &vuvnprim[14];
             vp = (float *) ((int64_t) vp + ((short *) vuvnprim)[5] * 12);
 
@@ -583,8 +582,6 @@ int MakeMirrorEnvironment(u_int *prim)
                 vp += 6;
                 sgn = 1.0f;
 
-                //MikuPan_RenderVertices(vp, loops);
-
                 for (i = 0; i < loops; i++)
                 {
                     if (prim[0] != 1)
@@ -610,10 +607,11 @@ int MakeMirrorEnvironment(u_int *prim)
             break;
     }
 
-    if (disp_flg == 0)
-    {
-        return 0;
-    }
+    /// TODO: RE-ENABLE THIS!
+    //if (disp_flg == 0)
+    //{
+    //    return 0;
+    //}
 
     mxmax += 16;
     mxmin -= 16;
@@ -710,22 +708,17 @@ int PreMirrorPrim(SgCAMERA *camera, u_int *prim)
                            *(sceVu0FMATRIX *) &SCRATCHPAD[0x430]);
                 Vu0LoadMatrix(tmpmat);
 
-                inline_asm__mirror_c_line_38(
-                    *(sceVu0FMATRIX *) &SCRATCHPAD[0xd0]);
+                inline_asm__mirror_c_line_38(*(sceVu0FMATRIX *) &SCRATCHPAD[0xd0]);
                 _SetRotTransPersMatrix(*(sceVu0FMATRIX *) &SCRATCHPAD[0x90]);
 
                 return MakeMirrorEnvironment(prim);
-                break;
             case 3:
-                Vu0CopyMatrix(*(sceVu0FMATRIX *) &SCRATCHPAD[0x430],
-                              lcp[prim[2]].lwmtx);
-                _MulMatrix(*(sceVu0FMATRIX *) &SCRATCHPAD[0x90], SgWSMtx,
-                           *(sceVu0FMATRIX *) &SCRATCHPAD[0x430]);
+                Vu0CopyMatrix(*(sceVu0FMATRIX *) &SCRATCHPAD[0x430], lcp[prim[2]].lwmtx);
+                _MulMatrix(*(sceVu0FMATRIX *) &SCRATCHPAD[0x90], SgWSMtx, *(sceVu0FMATRIX *) &SCRATCHPAD[0x430]);
                 break;
             case 4:
                 mir_flag = CheckBoundingBox(prim);
-                _MulMatrix(*(sceVu0FMATRIX *) &SCRATCHPAD[0xd0], SgCMVtx,
-                           *(sceVu0FMATRIX *) &SCRATCHPAD[0x430]);
+                _MulMatrix(*(sceVu0FMATRIX *) &SCRATCHPAD[0xd0], SgCMVtx, *(sceVu0FMATRIX *) &SCRATCHPAD[0x430]);
                 break;
         }
 
@@ -845,7 +838,10 @@ void CalcMirrorMatrix(SgCAMERA *camera)
 
     sceVu0UnitMatrix(tmpmat);
 
-    tmpmat[2][2] = -1.0f;
+    /// Flipping Z axis
+    //tmpmat[2][2] = -1.0f;
+    tmpmat[1][1] = -1.0f;
+    //tmpmat[0][0] = -1.0f;
 
     GetMatrixRotateAxis(quat, vaxis, qrot);
     _MulMatrix(tmpmat, tmpmat, quat);
@@ -869,6 +865,8 @@ void CalcMirrorMatrix(SgCAMERA *camera)
     Vu0CopyVector(mir_norm, norm);
 
     Vu0CopyMatrix(mir_mtx, tmpmat);
+
+    MikuPan_SetupMirrorMtx((float*)mir_mtx);
 }
 
 void MirrorDraw(SgCAMERA *camera, void *sgd_top,
@@ -895,9 +893,7 @@ void MirrorDraw(SgCAMERA *camera, void *sgd_top,
 
     num = CheckMirrorModel(sgd_top);
 
-    if (num == 0
-        || PreMirrorPrim(camera, (u_int *) GetTopProcUnitHeaderPtr(hs, num))
-               == 0)
+    if (num == 0 || PreMirrorPrim(camera, (u_int *) GetTopProcUnitHeaderPtr(hs, num)) == 0)
     {
         CalcMirrorMatrix(camera);
         return;

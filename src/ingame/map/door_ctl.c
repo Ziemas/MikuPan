@@ -219,7 +219,7 @@ void DoorPassRoom(u_char room_id)
     u_char dr_num;
     u_char room_no;
 
-    room_no = GetDataRoom(10, room_id);
+    room_no = GetDataRoom(MAP_DOOR_DAT, room_id);
 
     if (room_no == 0xff)
     {
@@ -429,12 +429,12 @@ void DoorDataInit()
         return;
     }
 
-    addr_si = (int *)(map_wrk.dat_adr + 10 * 4);
+    addr_si = (int *)(map_wrk.dat_adr + MAP_DOOR_DAT * 4);
     addr_si = (int *)MikuPan_GetHostPointer(*addr_si + BASE_ADDRESS);
     addr_si = (int *)MikuPan_GetHostPointer(addr_si[1] + BASE_ADDRESS);
 
-    room_id = GetRoomIdFromRoomNo(0, room_wrk.room_no);
-    room_no = GetDataRoom(10, room_id);
+    room_id = GetRoomIdFromRoomNo(MAP_ROOM_DAT, room_wrk.room_no);
+    room_no = GetDataRoom(MAP_DOOR_DAT, room_id);
 
     if (room_no == 0xff)
     {
@@ -3873,9 +3873,9 @@ void DoorDataRenewNext(u_char room_id)
 
     SetUpRoomCoordinate(room_id, room_wrk.pos[1]);
 
-    room_no = GetDataRoom(10, room_id);
+    room_no = GetDataRoom(MAP_DOOR_DAT, room_id);
 
-    addr_si = (int *)(map_wrk.dat_adr + 10 * 4);
+    addr_si = (int *)(map_wrk.dat_adr + MAP_DOOR_DAT * 4);
     addr_si = (int *)MikuPan_GetHostPointer(*addr_si + BASE_ADDRESS);
     addr_si = (int *)MikuPan_GetHostPointer(addr_si[1] + BASE_ADDRESS);
     addr_si = (int *)MikuPan_GetHostPointer(addr_si[room_no] + BASE_ADDRESS);
@@ -3978,10 +3978,10 @@ u_char GetNextRIdFromRNoDId(u_char room_no, u_short door_id)
     u_char dr_num;
     u_char room_id;
 
-    room_id = GetRoomIdFromRoomNo(0, room_no);
-    room_no = GetDataRoom(10, room_id);
+    room_id = GetRoomIdFromRoomNo(MAP_ROOM_DAT, room_no);
+    room_no = GetDataRoom(MAP_DOOR_DAT, room_id);
 
-    addr_si = (int *)(map_wrk.dat_adr + 10 * 4);
+    addr_si = (int *)(map_wrk.dat_adr + MAP_DOOR_DAT * 4);
     addr_si = (int *)MikuPan_GetHostPointer(*addr_si + BASE_ADDRESS);
     addr_si = (int *)MikuPan_GetHostPointer(addr_si[1] + BASE_ADDRESS);
 
@@ -4019,7 +4019,7 @@ u_char NextRoomRenew()
             return 0xff;
         }
 
-        room_no = GetDataRoom(0, disp_no);
+        room_no = GetDataRoom(MAP_ROOM_DAT, disp_no);
 
         if (room_no != 0xff)
         {

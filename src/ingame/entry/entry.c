@@ -12,6 +12,8 @@
 #include "ingame/entry/ap_zgost.h"
 #include "ingame/entry/ap_sgost.h"
 
+#include <string.h>
+
 /* data 322778 */ AP_WRK ap_wrk = {0};
 
 void EntryInit() 

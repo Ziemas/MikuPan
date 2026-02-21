@@ -16,7 +16,8 @@ const char* shader_file_name[MAX_SHADER_PROGRAMS][2] = {
     {"./shaders/untextured_sprite.vert", "./shaders/untextured_sprite.frag"},
     {"./shaders/simple_textured.vert", "./shaders/simple_textured.frag"},
     {"./shaders/bounding_box.vert", "./shaders/bounding_box.frag"},
-    {"./shaders/sprite_3D.vert", "./shaders/sprite_3D.frag"}
+    {"./shaders/sprite_3D.vert", "./shaders/sprite_3D.frag"},
+    {"./shaders/skybox.vert", "./shaders/skybox.frag"}
 };
 
 int MikuPan_InitShaders()

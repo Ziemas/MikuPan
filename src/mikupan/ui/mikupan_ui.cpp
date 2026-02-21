@@ -9,7 +9,6 @@
 #include "mikupan/gs/texture_manager.h"
 
 #include <algorithm>
-#include <map>
 #include <string>
 
 extern "C"
@@ -20,121 +19,7 @@ extern "C"
 #include "graphics/graph3d/sglight.h"
 }
 
-#include <imgui.h>
-#include <vector>
-#include <numeric>
-#include <cmath>
-
-class FrameTimeGraph {
-public:
-    FrameTimeGraph(int max_samples = 300, float ms_scale = -1.0f)
-        : max_samples_(std::max(8, max_samples)), ms_scale_(ms_scale)
-    {
-        times_.reserve(max_samples_);
-    }
-
-    void update(float dt_sec)
-    {
-        float ms = dt_sec;
-
-        if ((int)times_.size() >= max_samples_)
-        {
-            times_.erase(times_.begin());
-        }
-        times_.push_back(ms);
-
-        sum_ms_ += ms;
-        if (times_.size() > 1) {
-        }
-    }
-
-    void draw(const char* label = "Frame Time", ImVec2 size = ImVec2(0,0))
-    {
-        if (times_.empty())
-        {
-            ImGui::TextUnformatted("No frame data yet");
-            return;
-        }
-
-        float sum = 0.0f;
-        float minv = times_[0];
-        float maxv = times_[0];
-
-        for (float v : times_)
-        {
-            sum += v;
-            if (v < minv) minv = v;
-            if (v > maxv) maxv = v;
-        }
-
-        float avg = sum / (float)times_.size();
-        float latest = times_.back();
-
-        ImGui::Text("%s: %.1f ms (%.1f FPS)", label, latest, latest > 0.0f ? 1000.0f/latest : 0.0f);
-        ImGui::Text("Avg: %.2f ms (%.1f FPS)  Min: %.2f ms  Max: %.2f ms  Samples: %zu", avg, avg > 0.0f ? 1000.0f/avg : 0.0f, minv, maxv, times_.size());
-
-        float scale = ms_scale_ > 0.0f ? ms_scale_ : std::max(maxv, avg * 1.5f);
-        if (scale < 1.0f) scale = 1.0f;
-
-        ImGui::PlotLines("##plotlines", times_.data(), (int)times_.size(), 0, nullptr, 0.0f, scale, size);
-
-        ImGui::Spacing();
-        ImGui::Text("Frame time histogram (ms)");
-        const int buckets = 16;
-        std::vector<int> hist(buckets);
-        float step = scale / (float)buckets;
-        for (float v : times_)
-            {
-            int b = (int)std::floor(v / step);
-            if (b < 0) b = 0;
-            if (b >= buckets) b = buckets - 1;
-            hist[b]++;
-        }
-
-        std::vector<float> histf(buckets);
-        int maxcount = 1;
-        for (int i = 0; i < buckets; ++i)
-        {
-            histf[i] = (float)hist[i];
-
-            if (hist[i] > maxcount)
-            {
-                maxcount = hist[i];
-            }
-        }
-
-        ImGui::PlotLines("##hist", histf.data(), buckets, 0, nullptr, 0.0f, (float)maxcount, ImVec2(0,60));
-    }
-
-    void setMaxSamples(int max_samples)
-    {
-        max_samples_ = std::max(8, max_samples);
-        times_.reserve(max_samples_);
-        if ((int)times_.size() > max_samples_)
-        {
-            times_.erase(times_.begin(), times_.begin() + ((int)times_.size() - max_samples_));
-        }
-    }
-
-    void setManualScaleMs(float ms)
-    {
-        ms_scale_ = ms;
-    }
-
-    void clear()
-    {
-        times_.clear();
-    }
-
-private:
-    std::vector<float> times_;
-    int max_samples_ = 300;
-    float ms_scale_ = -1.0f; // negative means auto scale
-    double sum_ms_ = 0.0; // reserved for future use
-};
-
 FrameTimeGraph g_frame_graph(600);
-
 bool show_fps = true;
 bool show_menu_bar = false;
 bool show_frame_time_graph = false;
@@ -144,6 +29,108 @@ bool camera_debug = false;
 int render_wireframe = 0;
 int render_normals = 0;
 bool show_texture_list = 0;
+
+FrameTimeGraph::FrameTimeGraph(int max_samples, float ms_scale) : max_samples_(std::max(8, max_samples)), ms_scale_(ms_scale)
+{
+    times_.reserve(max_samples_);
+}
+
+void FrameTimeGraph::update(float dt_sec)
+{
+    float ms = dt_sec;
+
+    if ((int)times_.size() >= max_samples_)
+    {
+        times_.erase(times_.begin());
+    }
+    times_.push_back(ms);
+
+    sum_ms_ += ms;
+    if (times_.size() > 1) {
+    }
+}
+
+void FrameTimeGraph::draw(const char *label, ImVec2 size)
+{
+    if (times_.empty())
+    {
+        ImGui::TextUnformatted("No frame data yet");
+        return;
+    }
+
+    ImGui::Begin("Frame Time Graph");
+
+    float sum = 0.0f;
+    float minv = times_[0];
+    float maxv = times_[0];
+
+    for (float v : times_)
+    {
+        sum += v;
+        if (v < minv) minv = v;
+        if (v > maxv) maxv = v;
+    }
+
+    float avg = sum / (float)times_.size();
+    float latest = times_.back();
+
+    ImGui::Text("%s: %.1f ms (%.1f FPS)", label, latest, latest > 0.0f ? 1000.0f/latest : 0.0f);
+    ImGui::Text("Avg: %.2f ms (%.1f FPS)  Min: %.2f ms  Max: %.2f ms  Samples: %zu", avg, avg > 0.0f ? 1000.0f/avg : 0.0f, minv, maxv, times_.size());
+
+    float scale = ms_scale_ > 0.0f ? ms_scale_ : std::max(maxv, avg * 1.5f);
+    if (scale < 1.0f) scale = 1.0f;
+
+    ImGui::PlotLines("##plotlines", times_.data(), (int)times_.size(), 0, nullptr, 0.0f, scale, size);
+
+    ImGui::Spacing();
+    ImGui::Text("Frame time histogram (ms)");
+    const int buckets = 16;
+    std::vector<int> hist(buckets);
+    float step = scale / (float)buckets;
+    for (float v : times_)
+    {
+        int b = (int)std::floor(v / step);
+        if (b < 0) b = 0;
+        if (b >= buckets) b = buckets - 1;
+        hist[b]++;
+    }
+
+    std::vector<float> histf(buckets);
+    int maxcount = 1;
+    for (int i = 0; i < buckets; ++i)
+    {
+        histf[i] = (float)hist[i];
+
+        if (hist[i] > maxcount)
+        {
+            maxcount = hist[i];
+        }
+    }
+
+    ImGui::PlotLines("##hist", histf.data(), buckets, 0, nullptr, 0.0f, (float)maxcount, ImVec2(0,60));
+
+    ImGui::End();
+}
+
+void FrameTimeGraph::setMaxSamples(int max_samples)
+{
+    max_samples_ = std::max(8, max_samples);
+    times_.reserve(max_samples_);
+    if ((int)times_.size() > max_samples_)
+    {
+        times_.erase(times_.begin(), times_.begin() + ((int)times_.size() - max_samples_));
+    }
+}
+
+void FrameTimeGraph::setManualScaleMs(float ms)
+{
+    ms_scale_ = ms;
+}
+
+void FrameTimeGraph::clear()
+{
+    times_.clear();
+}
 
 void MikuPan_InitUi(SDL_Window *window, SDL_GLContext renderer)
 {
@@ -160,7 +147,6 @@ void MikuPan_RenderUi()
 {
     ImGui::Render();
     glad_glViewport(0, 0, (int)ImGui::GetIO().DisplaySize.x, (int)ImGui::GetIO().DisplaySize.y);
-    //glad_glClear(GL_COLOR_BUFFER_BIT);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
@@ -173,64 +159,17 @@ void MikuPan_StartFrameUi()
 
 void MikuPan_DrawUi()
 {
-    if (ImGui::IsKeyPressed(ImGuiKey_F1))
-    {
-        show_menu_bar = !show_menu_bar;
-    }
-
-    if (ImGui::IsKeyPressed(ImGuiKey_F2))
-    {
-        dbg_wrk.mode_on = !dbg_wrk.mode_on;
-    }
-
     g_frame_graph.update(1000.0f / ImGui::GetIO().Framerate);
 
-    if (show_menu_bar && ImGui::BeginMainMenuBar())
-    {
-        if (ImGui::BeginMenu("Debug"))
-        {
-            if (ImGui::BeginMenu("Camera"))
-            {
-                //ImGui::Toggle("Camera", (bool*)&camera_debug, ImGuiToggleFlags_Animated);
-                ImGui::Toggle("Wireframe", (bool*)&render_wireframe, ImGuiToggleFlags_Animated);
-                ImGui::Toggle("Normals", (bool*)&render_normals, ImGuiToggleFlags_Animated);
-                ImGui::Toggle("Textures", (bool*)&show_texture_list, ImGuiToggleFlags_Animated);
+    MikuPan_UiHandleShortcuts();
 
-                if (ImGui::Button("Clear Texture Cache"))
-                {
-                    MikuPan_RequestFlushTextureCache();
-                }
-
-                ImGui::EndMenu();
-            }
-
-            ImGui::Toggle("Ingame Debug Menu", (bool*)&dbg_wrk.mode_on, ImGuiToggleFlags_Animated);
-            ImGui::Toggle("Controller Config", &controller_config, ImGuiToggleFlags_Animated);
-
-            ImGui::EndMenu();
-        }
-
-        if (ImGui::BeginMenu("Performance"))
-        {
-            ImGui::Toggle("FPS Counter", &show_fps, ImGuiToggleFlags_Animated);
-            ImGui::Toggle("Frame Time Graph", &show_frame_time_graph, ImGuiToggleFlags_Animated);
-
-            ImGui::EndMenu();
-        }
-
-        ImGui::EndMainMenuBar();
-    }
+    MikuPan_UiMenuBar();
 
     if (controller_config)
     {
         ImGui::Begin("Controller");
         ImGui::Toggle("Rumble", &controller_rumble_test, ImGuiToggleFlags_Animated);
         ImGui::End();
-    }
-
-    if (controller_rumble_test)
-    {
-        //scePadSetActDirect(0, 0, NULL);
     }
 
     if (dbg_wrk.mode_on == 1)
@@ -240,45 +179,12 @@ void MikuPan_DrawUi()
 
     if (show_frame_time_graph)
     {
-        ImGui::Begin("Frame Time Graph");
         g_frame_graph.draw("Frame Time");
-        ImGui::End();
     }
 
     if (show_texture_list)
     {
-        ImGui::Begin("OpenGL Texture");
-
-        // Create a sortable container
-        std::vector<MikuPan_TextureInfo*> sorted_textures;
-        sorted_textures.reserve(mikupan_render_texture_atlas.size());
-
-        // Copy values from unordered_map
-        for (const auto& pair : mikupan_render_texture_atlas)
-        {
-            sorted_textures.push_back(pair.second);
-        }
-
-        // Sort by id
-        std::sort(sorted_textures.begin(), sorted_textures.end(),
-            [](const MikuPan_TextureInfo* a, const MikuPan_TextureInfo* b)
-            {
-                return a->id < b->id;
-            });
-
-        for (auto texture : sorted_textures)
-        {
-            std::string label = "Texture ID ";
-            label += std::to_string(texture->id);
-
-            if (ImGui::CollapsingHeader(label.c_str()))
-            {
-                ImGui::Text("%d: %d x %d", texture->id, texture->width, texture->height);
-                ImGui::Image((ImTextureID)(intptr_t)texture->id, ImVec2(texture->width, texture->height));
-            }
-        }
-
-        ImGui::End();
+        MikuPan_ShowTextureList();
     }
 
     if (show_fps)
@@ -312,4 +218,89 @@ int MikuPan_IsWireframeRendering()
 int MikuPan_IsNormalsRendering()
 {
     return render_normals;
+}
+
+void MikuPan_ShowTextureList()
+{
+    ImGui::Begin("OpenGL Texture");
+
+    std::vector<MikuPan_TextureInfo*> sorted_textures;
+    sorted_textures.reserve(mikupan_render_texture_atlas.size());
+
+    for (const auto& pair : mikupan_render_texture_atlas)
+    {
+        sorted_textures.push_back(pair.second);
+    }
+
+    std::sort(sorted_textures.begin(), sorted_textures.end(),
+        [](const MikuPan_TextureInfo* a, const MikuPan_TextureInfo* b)
+        {
+            return a->id < b->id;
+        });
+
+    for (auto texture : sorted_textures)
+    {
+        std::string label = "Texture ID ";
+        label += std::to_string(texture->id);
+
+        if (ImGui::CollapsingHeader(label.c_str()))
+        {
+            ImGui::Text("%d: %d x %d", texture->id, texture->width, texture->height);
+            ImGui::Image((ImTextureID)(intptr_t)texture->id, ImVec2(texture->width, texture->height));
+        }
+    }
+
+    ImGui::End();
+}
+
+void MikuPan_UiHandleShortcuts()
+{
+    if (ImGui::IsKeyPressed(ImGuiKey_F1))
+    {
+        show_menu_bar = !show_menu_bar;
+    }
+
+    if (ImGui::IsKeyPressed(ImGuiKey_F2))
+    {
+        dbg_wrk.mode_on = !dbg_wrk.mode_on;
+    }
+}
+
+void MikuPan_UiMenuBar()
+{
+    if (show_menu_bar && ImGui::BeginMainMenuBar())
+    {
+        if (ImGui::BeginMenu("Debug"))
+        {
+            if (ImGui::BeginMenu("Rendering"))
+            {
+                //ImGui::Toggle("Camera", (bool*)&camera_debug, ImGuiToggleFlags_Animated);
+                ImGui::Toggle("Wireframe", (bool*)&render_wireframe, ImGuiToggleFlags_Animated);
+                ImGui::Toggle("Normals", (bool*)&render_normals, ImGuiToggleFlags_Animated);
+                ImGui::Toggle("Textures", (bool*)&show_texture_list, ImGuiToggleFlags_Animated);
+
+                if (ImGui::Button("Clear Texture Cache"))
+                {
+                    MikuPan_RequestFlushTextureCache();
+                }
+
+                ImGui::EndMenu();
+            }
+
+            ImGui::Toggle("Ingame Debug Menu", (bool*)&dbg_wrk.mode_on, ImGuiToggleFlags_Animated);
+            //ImGui::Toggle("Controller Config", &controller_config, ImGuiToggleFlags_Animated);
+
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Performance"))
+        {
+            ImGui::Toggle("FPS Counter", &show_fps, ImGuiToggleFlags_Animated);
+            ImGui::Toggle("Frame Time Graph", &show_frame_time_graph, ImGuiToggleFlags_Animated);
+
+            ImGui::EndMenu();
+        }
+
+        ImGui::EndMainMenuBar();
+    }
 }

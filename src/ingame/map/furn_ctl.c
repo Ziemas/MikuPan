@@ -2,6 +2,7 @@
 #include "typedefs.h"
 #include "furn_ctl.h"
 
+#include "enums.h"
 #include "graphics/graph3d/gra3d.h"
 #include "graphics/motion/accessory.h"
 #include "graphics/motion/mime.h"
@@ -962,10 +963,10 @@ u_char FurnHitCheck(u_char *dx_max, u_char *dz_max, sceVu0FVECTOR pos, sceVu0FVE
     div_x = *dx_max;
     div_z = *dz_max;
 
-    addr = (int *)(map_wrk.dat_adr + 11 * 4);
+    addr = (int *)(map_wrk.dat_adr + MAP_FURNITUR * 4);
     addr = (int *)MikuPan_GetHostPointer(*addr + BASE_ADDRESS);
 
-    rm_no = GetDataRoom(11, room);
+    rm_no = GetDataRoom(MAP_FURNITUR, room);
 
     if (rm_no == 0xff)
     {
@@ -1099,9 +1100,9 @@ u_char FurnHitCheck2(u_short pos_x, u_short pos_y, u_char room_id)
     u_char sq_num;
     int *v0, *v1; // not in STAB
 
-    addr_si = (int *)(map_wrk.dat_adr + 11 * 4);
+    addr_si = (int *)(map_wrk.dat_adr + MAP_FURNITUR * 4);
     addr_si = (int *)MikuPan_GetHostPointer(*addr_si + BASE_ADDRESS);
-    room_no = GetDataRoom(11, room_id);
+    room_no = GetDataRoom(MAP_FURNITUR, room_id);
 
     if (room_no == 0xff)
     {
