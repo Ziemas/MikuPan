@@ -102,6 +102,8 @@ int GuardGhostAppearMain(void)
         // do nothing ...
     break;
     }
+
+    return 1;
 }
 
 int GuardGhostReloadReq()

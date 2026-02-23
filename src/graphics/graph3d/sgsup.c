@@ -19,6 +19,7 @@
 #include "graphics/graph3d/sglib.h"
 #include "graphics/graph3d/sglight.h"
 #include "graphics/graph3d/sgsu.h"
+#include "mikupan/mikupan_logging_c.h"
 #include "mikupan/rendering/mikupan_renderer.h"
 
 #include <enums.h>
@@ -522,7 +523,7 @@ void SgSortUnitP(void *sgd_top, int pnum)
 
     if (((int64_t) lcp & 0xf) != 0)
     {
-        printf("SgSortUnitP Data broken. %x\n", (int64_t) hs);
+        info_log("SgSortUnitP Data broken. %x", (int64_t) hs);
         return;
     }
 
@@ -605,7 +606,7 @@ void SgSortGroupP(void *sgd_top, int gnum)
 
     if (((int64_t) lcp & 0xf) != 0)
     {
-        printf("SgSortGroupP Data broken. %x\n", (int64_t) hs);
+        info_log("SgSortGroupP Data broken. %x", (int64_t) hs);
         return;
     }
 

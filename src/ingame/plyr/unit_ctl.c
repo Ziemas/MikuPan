@@ -170,7 +170,7 @@ u_char OutSightChk(sceVu0FVECTOR tp, sceVu0FVECTOR vp, float rot, float sight, f
 
     if (dist == 0.0f || dist >= GetDistV(tp, vp))
     {
-        if (RotRngChk(vp,tp,rot,sight * 0.5f) != 0)
+        if (RotRngChk(vp, tp, rot, sight * 0.5f) != 0)
         {
             chk = 0;
         }

@@ -15,9 +15,10 @@
 #include "main/glob.h"
 #include "os/eeiop/cdvd/eecdvd.h"
 #include "os/eeiop/eese.h"
+#include "sce/libvu0.h"
 
-#include <mikupan/mikupan_memory.h>
 #include <graphics/motion/motion.h>
+#include <mikupan/mikupan_memory.h>
 // #include "graphics/motion/motion.h"
 
 u_char dgst_room[] = {
@@ -166,7 +167,7 @@ int DeadGhostLoad()
     case DGLOAD_MODE_MDL:
         if (IsLoadEndAll() != 0)
         {
-            motInitEnemyMdl((u_int *)M_SLCT_CMN_PK2_ADDRESS, M055_SYOUALL);
+            motInitEnemyMdl((u_int *)MikuPan_GetHostPointer(M_SLCT_CMN_PK2_ADDRESS), M055_SYOUALL);
             LoadEneDmgTex(42, (u_int *)ENE_DMG_TEX_ADDRESS);
             LoadReq(M042_SYOUKI2_ANM, SPRITE_ADDRESS);
 
@@ -176,7 +177,7 @@ int DeadGhostLoad()
     case DGLOAD_MODE_MOT:
         if (IsLoadEndAll() != 0)
         {
-            motInitEnemyAnm((u_int *)SPRITE_ADDRESS, M055_SYOUALL, A042_SYOUKIA);
+            motInitEnemyAnm((u_int *)MikuPan_GetHostPointer(SPRITE_ADDRESS), M055_SYOUALL, A042_SYOUKIA);
             SeFileLoadAndSetFGhost(SG046_SYOUKI1_BD, 16);
 
             ap_wrk.fg_se_empty[0] = 1;

@@ -49,7 +49,7 @@ extern void *_gp;
 //        ei        \n\
 //    ");
 
-int CreateThread(ThreadParam *);
+//int CreateThread(ThreadParam *);
 int StartThread(int, void *arg);
 int GetThreadId(void);
 int ChangeThreadPriority(int, int);

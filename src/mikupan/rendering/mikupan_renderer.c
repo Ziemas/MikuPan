@@ -18,8 +18,6 @@
 #include "main/glob.h"
 #include "mikupan/mikupan_utils.h"
 #include "mikupan_pipeline.h"
-#include "sce/libvu0.h"
-
 #include <glad/gl.h>
 
 u_int alpha_calc = GL_ONE_MINUS_SRC_ALPHA;
@@ -50,6 +48,8 @@ SDL_AppResult MikuPan_Init()
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
     SDL_SetAppMetadata("MikuPan", "1.0", "MikuPan");
 
+    info_log("Initializing SDL");
+
     if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD | SDL_INIT_JOYSTICK
                   | SDL_INIT_HAPTIC))
     {
@@ -64,28 +64,32 @@ SDL_AppResult MikuPan_Init()
 
     info_log("Loading SDL_GameControllerDB");
 
-    if (!SDL_AddGamepadMappingsFromFile("shaders/gamecontrollerdb.txt"))
+    if (!SDL_AddGamepadMappingsFromFile("resources/gamecontrollerdb.txt"))
     {
         info_log(SDL_GetError());
         return SDL_APP_FAILURE;
     }
+
+    info_log("Creating SDL Window");
 
     window = SDL_CreateWindow("MikuPan", window_width, window_height,
                               SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 
-    if (window == nullptr)
+    if (window == NULL)
     {
         info_log(SDL_GetError());
         return SDL_APP_FAILURE;
     }
 
-    SDL_Surface* iconSurface = SDL_LoadBMP("shaders/angry_noise_sae.bmp");
+    SDL_Surface* iconSurface = SDL_LoadBMP("resources/angry_noise_sae.bmp");
     if (!SDL_SetWindowIcon(window, iconSurface))
     {
         info_log(SDL_GetError());
     }
 
     SDL_DestroySurface(iconSurface);
+
+    info_log("Creating OpenGL Context");
 
     SDL_GLContext gl_context = SDL_GL_CreateContext(window);
 
@@ -579,8 +583,6 @@ void MikuPan_RenderSprite(MikuPan_Rect src, MikuPan_Rect dst, u_char r,
 
 void MikuPan_RenderSprite3D(sceGsTex0 *tex, float* buffer)
 {
-
-
     MikuPan_SetCurrentShaderProgram(SPRITE_3D_SHADER);
     MikuPan_PipelineInfo* pipeline = MikuPan_GetPipelineInfo(POSITION3_UV_3D);
 
@@ -668,29 +670,8 @@ void MikuPan_SetModelTransformMatrix(sceVu0FVECTOR *m)
 
 void MikuPan_SetModelTransform(unsigned int *prim)
 {
-    mat4 model= {0};
     SgCOORDUNIT* cp = &lcp[prim[1]];
-    glm_mat4_copy(cp->lwmtx, model);
-
-    //glm_rotate_z(model, lcp[prim[1]].rot[2], model);
-    //glm_rotate_x(model, lcp[prim[1]].rot[0], model);
-    //glm_rotate_y(model, 3.1415926f, model);
-    //const float PI = 3.1415926f;
-    //sceVu0RotMatrixX(model, cp->lwmtx, PI);
-    //float grot = cp->rot[1] + PI > PI ? (cp->rot[1] + PI) - 6.2831855f : cp->rot[1] + PI;
-    //sceVu0RotMatrixY(model, model, grot);
-    //sceVu0RotMatrixX(model, model, cp->rot[0]);
-    //sceVu0RotMatrixZ(model, model, cp->rot[2]);
-
-    for (int i = 0; i < MAX_SHADER_PROGRAMS; i++)
-    {
-        MikuPan_SetShaderProgramWithBackup(i);
-
-        u_int current_program = MikuPan_GetCurrentShaderProgram();
-        glad_glUniformMatrix4fv(
-            glad_glGetUniformLocation(current_program, "model"), 1, GL_FALSE,
-            (float *) model);
-    }
+    MikuPan_SetModelTransformMatrix(cp->lwmtx);
 }
 
 void MikuPan_Camera(SgCAMERA *camera)

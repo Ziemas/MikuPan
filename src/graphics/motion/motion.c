@@ -24,17 +24,6 @@
 #include <mikupan/mikupan_memory.h>
 #include <string.h>
 
-#define SineCosineSafetyCheck(sine, cosine) \
-if (fabsf(cosine) == 1.0f)\
-{\
-sine = 0.0f;\
-}\
-\
-if (fabsf(sine) == 1.0f)\
-{\
-cosine = 0.0f;\
-}\
-
 typedef struct {
     u_char file_id[4];
     u_int map_flg;
@@ -1096,8 +1085,6 @@ void motInterpMatrix(sceVu0FMATRIX interp, sceVu0FMATRIX m0, sceVu0FMATRIX m1, f
         cos = SgCosf(r);
         sin = SgSinf(r);
 
-        SineCosineSafetyCheck(sin, cos);
-
         val = 1.0f - cos;
 
         sceVu0UnitMatrix(m);
@@ -1245,12 +1232,8 @@ void LocalRotMatrixX(sceVu0FMATRIX m0, sceVu0FMATRIX m1, float rx)
     rot[1][1] = SgCosf(rx);
     rot[2][1] = -SgSinf(rx);
 
-    SineCosineSafetyCheck(rot[2][1], rot[1][1]);
-
     rot[1][2] = SgSinf(rx);
     rot[2][2] = SgCosf(rx);
-
-    SineCosineSafetyCheck(rot[1][2], rot[2][2]);
 
     sceVu0MulMatrix(m0, m1, rot);
 }
@@ -1264,12 +1247,8 @@ void LocalRotMatrixY(sceVu0FMATRIX m0, sceVu0FMATRIX m1, float ry)
     rot[0][0] = SgCosf(ry);
     rot[0][2] = SgSinf(ry);
 
-    SineCosineSafetyCheck(rot[0][2],  rot[0][0]);
-
     rot[2][0] = -SgSinf(ry);
     rot[2][2] = SgCosf(ry);
-
-    SineCosineSafetyCheck(rot[2][0],  rot[2][2]);
 
     sceVu0MulMatrix(m0,m1,rot);
 }
@@ -1283,12 +1262,8 @@ void LocalRotMatrixZ(sceVu0FMATRIX m0, sceVu0FMATRIX m1, float rz)
     rot[0][0] = SgCosf(rz);
     rot[1][0] = -SgSinf(rz);
 
-    SineCosineSafetyCheck(rot[1][0],  rot[0][0]);
-
     rot[0][1] = SgSinf(rz);
     rot[1][1] = SgCosf(rz);
-
-    SineCosineSafetyCheck(rot[0][1],  rot[1][1]);
 
     sceVu0MulMatrix(m0, m1, rot);
 }
@@ -1904,9 +1879,9 @@ void SceneSetCoordFrame(ANI_CTRL *ani_ctrl, u_int frame, u_int type)
 void motSetInvMatrix(sceVu0FMATRIX m1, sceVu0FMATRIX m0)
 {
     u_int i;
-    sceVu0FMATRIX rot;
-    sceVu0FMATRIX scale;
-    sceVu0FMATRIX trans;
+    sceVu0FMATRIX rot = {0};
+    sceVu0FMATRIX scale = {0};
+    sceVu0FMATRIX trans = {0};
     sceVu0FVECTOR inv_inner = {0};
 
     sceVu0UnitMatrix(rot);
@@ -1967,7 +1942,7 @@ void sceRotMatrixXYZ(sceVu0FMATRIX m0, sceVu0FMATRIX m1, sceVu0FVECTOR rot)
     sceVu0RotMatrixX(mat, mat, rot[0]);
     sceVu0RotMatrixY(mat, mat, rot[1]);
     sceVu0RotMatrixZ(mat, mat, rot[2]);
-    sceVu0CopyMatrix(m0, m1);
+    sceVu0CopyMatrix(m0, mat);
 }
 
 MIME_CTRL mim_chodo[20] = {0};

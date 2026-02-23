@@ -1,6 +1,6 @@
 #ifndef GRAPHICS_GRAPH2D_EFFECT_SCR_H
 #define GRAPHICS_GRAPH2D_EFFECT_SCR_H
-
+#include "common.h"
 #include "typedefs.h"
 #include "structs.h"
 
@@ -40,7 +40,7 @@ void CallBlur(int type, int wait, u_char alpha, float scale, float rot);
 void CallBlur2(int in, int keep, int out, u_char alpha, float scale, float rot);
 void CallBlur3(int in, int keep, int out, u_char alpha, float scale, float rot, float cx, float cy);
 void SubFocus(int ef);
-void SetFocus(EFFECT_CONT *ec);
+void SetFocus1(EFFECT_CONT *ec);
 void RunFocus(EFFECT_CONT *ec);
 void CallFocus(int type, int wait, int gap);
 void CallFocus2(int in, int keep, int out, int max);

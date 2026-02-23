@@ -3,15 +3,6 @@
 #include <glad/gl.h>
 #include <stdlib.h>
 
-/// DEFAULT_SHADER
-//GLuint VAO, VBO, uvVBO = 0;
-
-/// MESH_0x12_SHADER
-//GLuint MESH_0x12_VAO, MESH_0x12_VN_VBO, MESH_0x12_UV_VBO = 0;
-//GLuint gSpriteVAO, gSpriteVBO = 0;
-//GLuint gShapeVAO, gShapeVBO = 0;
-//GLuint gBBVAO, gBBVBO = 0;
-
 MikuPan_PipelineInfo pipelines[MAX_NUMBER_OF_PIPELINES] = {0};
 
 void MikuPan_InitPipeline()

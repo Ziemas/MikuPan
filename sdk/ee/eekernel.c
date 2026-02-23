@@ -2,9 +2,9 @@
 
 void* _gp;
 
-int CreateThread(ThreadParam*)
-{
-}
+//int CreateThread(ThreadParam*)
+//{
+//}
 
 int StartThread(int, void* arg)
 {

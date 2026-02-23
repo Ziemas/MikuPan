@@ -7,9 +7,6 @@
 // RAND_MAX = (2**31-1)
 #define RAND_MAX 2147483647
 
-// /usr/local/sce/ee/gcc/src/newlib/libm/math/s_isnan.c
-// int isnan(double x);
-
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -32,7 +29,6 @@
 #include "os/eeiop/cdvd/eecdvd.h"
 #include "outgame/btl_mode/btl_mode.h"
 #include "mikupan/rendering/mikupan_renderer.h"
-
 #include <mikupan/mikupan_memory.h>
 
 typedef struct { // 0x28
@@ -530,7 +526,7 @@ void SubFocus(/* a0 4 */ int ef)
     SetTexDirectS(0x200, &sd, 0);
 }
 
-void SetFocus(/* s0 16 */ EFFECT_CONT *ec)
+void SetFocus1(/* s0 16 */ EFFECT_CONT *ec)
 {
     if (ec->dat.uc8[2] == 0 || eff_focus.flow != 3)
     {

@@ -28,8 +28,8 @@ void GetSquare(sceVu0FVECTOR *v0, sceVu0FVECTOR *v1)
 
 float GetDist(float x, float z)
 {
-    sceVu0FVECTOR v0;
-    sceVu0FVECTOR v1;
+    sceVu0FVECTOR v0 = {0};
+    sceVu0FVECTOR v1 = {0};
     
     v0[0] = __builtin_fabsf(x);
     v0[2] = __builtin_fabsf(z);
@@ -43,23 +43,23 @@ float GetDist(float x, float z)
 
 float GetDistV(float *p0, float *p1)
 {
-    sceVu0FVECTOR v0;
-    sceVu0FVECTOR v1;
+    sceVu0FVECTOR v0 = {0};
+    sceVu0FVECTOR v1 = {0};
     
     v0[0] = __builtin_fabsf(p0[0] - p1[0]);
     v0[2] = __builtin_fabsf(p0[2] - p1[2]);
     
     v0[1] = v0[3] = 0.0f;
     
-    GetSquare(&v0,&v1);
+    GetSquare(&v0, &v1);
     
     return __builtin_sqrtf(v1[0] + v1[2]);
 }
 
 float GetDistV2(float *p0, float *p1)
 {
-    sceVu0FVECTOR v0;
-    sceVu0FVECTOR v1;
+    sceVu0FVECTOR v0 = {0};
+    sceVu0FVECTOR v1 = {0};
     
     v0[0] = __builtin_fabsf(p0[0] - p1[0]);
     v0[2] = __builtin_fabsf(p0[2] - p1[2]);
@@ -76,8 +76,8 @@ float GetDistV2(float *p0, float *p1)
 
 void RotFvector(float *rot, float *tv)
 {
-    sceVu0FMATRIX work;
-    sceVu0FMATRIX rot_matrix;
+    sceVu0FMATRIX work = {0};
+    sceVu0FMATRIX rot_matrix = {0};
     
     sceVu0UnitMatrix(work);
     if (rot[2] != 0.0f)

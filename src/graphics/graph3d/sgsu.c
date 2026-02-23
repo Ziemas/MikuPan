@@ -369,10 +369,10 @@ u_int *SetVUVNDataPost(u_int *prim)
 
 void printTEX0(sceGsTex0 *tex0)
 {
-    info_log("TBP0 %x TBW %d PSM %x TW %d TH %d TCC %d\n", tex0->TBP0,
+    info_log("TBP0 %x TBW %d PSM %x TW %d TH %d TCC %d", tex0->TBP0,
              tex0->TBW, tex0->PSM, tex0->TW, tex0->TH, tex0->TCC);
 
-    info_log("TFX %d CBP %x CPSM %x CSM %d CSA %d CLD %x\n", tex0->TFX,
+    info_log("TFX %d CBP %x CPSM %x CSM %d CSA %d CLD %x", tex0->TFX,
              tex0->CBP, tex0->CPSM, tex0->CSM, tex0->CSA, tex0->CLD);
 }
 
@@ -411,6 +411,7 @@ void SetVUMeshData(u_int *prim)
             FlushModel(0);
             break;
         case 0x80:
+            MikuPan_RenderMeshType0x82(vuvnprim, prim);
             AppendDmaTag((u_int) &prim[4], prim[2]);
             AppendDmaTag((u_int) & ((u_char *) vuvnprim)[16],
                          ((u_char *) vuvnprim)[12]);

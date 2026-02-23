@@ -1184,7 +1184,7 @@ void mimWeightCtrl(ANI_CTRL *ani_ctrl, u_int weight_id, float scale)
     else
     {
         m[0][3] = m[1][3] = m[2][3] = 0.0f;
-        m[3][0] = m[3][1] =m[3][2] = 0.0f;
+        m[3][0] = m[3][1] = m[3][2] = 0.0f;
         m[3][3] = 1.0f;
 
         sceVu0Normalize(m[0], m[0]);

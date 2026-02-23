@@ -230,15 +230,14 @@ set(MIKUPAN_SOURCES "src/mikupan/mikupan_file.cpp"
         src/ingame/map/find_dat.c
         src/mikupan/rendering/mikupan_pipeline.c
         src/mikupan/mikupan_utils.c
-        src/mikupan/mikupan_utils.h
 )
 
 add_executable(MikuPan ${MIKUPAN_SOURCES})
 
-target_include_directories(MikuPan PRIVATE "sdk/" "src" "resources/" "extern/" "extern/glad/include/" ${SDL3_INCLUDE_DIR})
+target_include_directories(MikuPan PRIVATE "sdk/" "src" "extern/" "extern/glad/include/" ${SDL3_INCLUDE_DIR})
 
 target_link_libraries(MikuPan PRIVATE m imgui SDL3::SDL3 spdlog::spdlog cglm)
 
 add_custom_command(TARGET MikuPan POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/shaders $<TARGET_FILE_DIR:MikuPan>/shaders
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/resources $<TARGET_FILE_DIR:MikuPan>/resources
 )

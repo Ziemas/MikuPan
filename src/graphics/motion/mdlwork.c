@@ -168,7 +168,7 @@ void SortUnitRefCoordP(void *sgd_top, SgCOORDUNIT *coordp, int pnum)
 
     if (((u_int)coordp % 16)) // checking alignment? coordp->matrix is a sceVu0FMATRIX and should be 16 aligned!
     {
-        info_log("SgSortUnitP Data broken. %x\n", (u_int)sgd_top);
+        info_log("SgSortUnitP Data broken. %x", (u_int)sgd_top);
         return;
     }
 

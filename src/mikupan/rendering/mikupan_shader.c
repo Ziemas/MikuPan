@@ -9,15 +9,15 @@ GLuint backup_current_program = 0;
 u_int shader_list[MAX_SHADER_PROGRAMS] = {0};
 
 const char* shader_file_name[MAX_SHADER_PROGRAMS][2] = {
-    {"./shaders/default.vert", "./shaders/default.frag"},
-    {"./shaders/mesh_0x12.vert", "./shaders/mesh_0x12.frag"},
-    {"./shaders/mesh_0x2.vert", "./shaders/mesh_0x2.frag"},
-    {"./shaders/ui_sprite.vert", "./shaders/ui_sprite.frag"},
-    {"./shaders/untextured_sprite.vert", "./shaders/untextured_sprite.frag"},
-    {"./shaders/simple_textured.vert", "./shaders/simple_textured.frag"},
-    {"./shaders/bounding_box.vert", "./shaders/bounding_box.frag"},
-    {"./shaders/sprite_3D.vert", "./shaders/sprite_3D.frag"},
-    {"./shaders/skybox.vert", "./shaders/skybox.frag"}
+    {"./resources/shaders/default.vert",            "./resources/shaders/default.frag"},
+    {"./resources/shaders/mesh_0x12.vert",          "./resources/shaders/mesh_0x12.frag"},
+    {"./resources/shaders/mesh_0x2.vert",           "./resources/shaders/mesh_0x2.frag"},
+    {"./resources/shaders/ui_sprite.vert",          "./resources/shaders/ui_sprite.frag"},
+    {"./resources/shaders/untextured_sprite.vert",  "./resources/shaders/untextured_sprite.frag"},
+    {"./resources/shaders/simple_textured.vert",    "./resources/shaders/simple_textured.frag"},
+    {"./resources/shaders/bounding_box.vert",       "./resources/shaders/bounding_box.frag"},
+    {"./resources/shaders/sprite_3D.vert",          "./resources/shaders/sprite_3D.frag"},
+    {"./resources/shaders/skybox.vert",             "./resources/shaders/skybox.frag"}
 };
 
 int MikuPan_InitShaders()

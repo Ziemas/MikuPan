@@ -1,4 +1,7 @@
 #include "libpad.h"
+
+#include "mikupan/mikupan_logging_c.h"
+#include "mikupan/mikupan_utils.h"
 #include "os/pad.h"
 #include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_keyboard.h>
@@ -30,7 +33,10 @@ int scePadPortOpen(int port, int slot, void* addr)
 
     gamepad = SDL_OpenGamepad(joysticks_id[0]);
 
+    info_log("Controller %s connected to", SDL_GetGamepadName(gamepad));
+
     SDL_free(joysticks_id);
+
     return 1;
 }
 
@@ -47,18 +53,6 @@ int scePadGetState(int port, int slot)
     //}
 
     return scePadStateStable;
-}
-
-static inline uint8_t SDL_AxisToPS2_Deadzone(int sdl_axis, int deadzone)
-{
-    if (abs(sdl_axis) < deadzone)
-        sdl_axis = 0;
-
-    if (sdl_axis < -32768) sdl_axis = -32768;
-    if (sdl_axis >  32767) sdl_axis =  32767;
-
-    int ps2 = (sdl_axis + 32768) * 255 / 65535;
-    return (uint8_t)ps2;
 }
 
 int scePadRead(int port, int slot, unsigned char* rdata)
@@ -93,10 +87,10 @@ int scePadRead(int port, int slot, unsigned char* rdata)
         data[1] ^= SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER)      ? sce_pad[14] : 0;
         data[1] ^= SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_LEFT_SHOULDER)  ? sce_pad[15] : 0;
 
-        rdata[5] = SDL_AxisToPS2_Deadzone(SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHTY), 0);
-        rdata[4] = SDL_AxisToPS2_Deadzone(SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHTX), 0);
-        rdata[7] = SDL_AxisToPS2_Deadzone(SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_LEFTY), 0);
-        rdata[6] = SDL_AxisToPS2_Deadzone(SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_LEFTX), 0);
+        rdata[5] = MikuPan_GamePadAxisToPS2(SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHTY), 0);
+        rdata[4] = MikuPan_GamePadAxisToPS2(SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHTX), 0);
+        rdata[7] = MikuPan_GamePadAxisToPS2(SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_LEFTY), 0);
+        rdata[6] = MikuPan_GamePadAxisToPS2(SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_LEFTX), 0);
     }
     else
     {

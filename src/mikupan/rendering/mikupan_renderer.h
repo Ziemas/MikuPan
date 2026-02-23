@@ -1,7 +1,6 @@
 #ifndef MIKUPAN_SDL_RENDERER_H
 #define MIKUPAN_SDL_RENDERER_H
 #include "mikupan/mikupan_basictypes.h"
-
 #include <ingame/camera/camera.h>
 
 struct SGDPROCUNITHEADER;

@@ -804,11 +804,11 @@ void SetSpotGroup(sceVu0FMATRIX wlmtx)
 void SetLightData(SgCOORDUNIT *cp0, SgCOORDUNIT *cp1)
 {
     int i;
-    sceVu0FMATRIX tmp;
+    sceVu0FMATRIX tmp = {0};
     sceVu0FMATRIX tmp2;
-    sceVu0FVECTOR tmpv;
+    sceVu0FVECTOR tmpv = {0};
     sceVu0FVECTOR tmpv2;
-    sceVu0FVECTOR scale;
+    sceVu0FVECTOR scale = {0};
 
     if (cp1 == NULL)
     {

@@ -2599,9 +2599,6 @@ int DrawEnemy(int no)
             SgSortUnitKind(tmpModelp,-1);
             acsClothCtrl(ani_ctrl,ani_ctrl->mpk_p,mdl_no, 0);
 
-            //MikuPan_SetModelTransformMatrix(cp[manmdl_dat[mdl_no].waist_id].lwmtx);
-            //DrawBoundingBox(ebox);
-
             if (motCheckTrRateMdl(mdl_no) != 0)
             {
                 DrawEneSubObj(ani_ctrl->mpk_p, ene_wrk[j].tr_rate, ene_wrk[j].tr_rate2);

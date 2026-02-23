@@ -1334,7 +1334,7 @@ void EffectControl(int no)
         
         if (ecm[7].dat.uc8[0] == 7)
         {
-            SetFocus(&ecm[7]);
+            SetFocus1(&ecm[7]);
         }
         
         RunFocus(&ecm[7]);
