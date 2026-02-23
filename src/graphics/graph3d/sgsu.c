@@ -411,7 +411,7 @@ void SetVUMeshData(u_int *prim)
             FlushModel(0);
             break;
         case 0x80:
-            MikuPan_RenderMeshType0x82(vuvnprim, prim);
+            //MikuPan_RenderMeshType0x82(vuvnprim, prim);
             AppendDmaTag((u_int) &prim[4], prim[2]);
             AppendDmaTag((u_int) & ((u_char *) vuvnprim)[16],
                          ((u_char *) vuvnprim)[12]);
