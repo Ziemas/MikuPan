@@ -1,6 +1,7 @@
 #include "common.h"
 #include "ev_load.h"
 #include "main/glob.h"
+#include "ingame/ig_glob.h"
 #include "enums.h"
 #include "ev_spcl.h"
 #include "ingame/map/map_area.h"

@@ -3,16 +3,17 @@
 
 #include "typedefs.h"
 
+#include "graphics/graph3d/light_types.h"
 #include "ingame/camera/camera.h"
 #include "ingame/map/furn_spe/furn_spe.h"
 #include "ingame/map/furn_spe/fsla_main.h"
 #include "graphics/graph3d/load3d.h"
-#include "graphics/graph3d/light_dat.h"
 #include "graphics/graph3d/sg_dat.h"
 #include "graphics/graph3d/sglight.h"
 #include "graphics/graph3d/shadow.h"
 
 #include <stdint.h>
+#include "ingame/map/furn_types.h"
 
 extern u_int fly_display[3];
 extern sceVu0FVECTOR fog_param[64];

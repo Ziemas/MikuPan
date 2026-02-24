@@ -5,6 +5,7 @@
 
 #include "mikupan/mikupan_memory.h"
 #include "main/glob.h" // *
+#include "ig_glob.h"
 #include "mc/mc_main.h"
 #include "ingame/map/furn_ctl.h" //
 #include "ingame/entry/entry.h"

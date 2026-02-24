@@ -3,6 +3,7 @@
 #include "typedefs.h"
 
 #include "ee/eestruct.h"
+#include "sce/libgraph.h"
 #include "sce/libvu0.h"
 
 #include "graphics/graph3d/libsg.h"

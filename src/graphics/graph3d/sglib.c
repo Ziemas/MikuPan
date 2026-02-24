@@ -10,6 +10,7 @@
 #include "sce/libdma.h"
 #include "sce/libvu0.h"
 
+#include "graphics/graph3d/libsg.h"
 #include "graphics/graph3d/sg_dat.h"
 #include "graphics/graph3d/sgcam.h"
 #include "graphics/graph3d/sgdma.h"

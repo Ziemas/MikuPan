@@ -1,8 +1,9 @@
 #ifndef INGAME_ENEMY_MOVE_CTL_H
 #define INGAME_ENEMY_MOVE_CTL_H
 
+#include "move_types.h"
 #include "typedefs.h"
-#include "main/glob.h"
+#include "main/glob_types.h"
 
 // in the symbols this has explicit size: er_max_tbl[3];
 // but in `move_ctl.c` it needs to be unsized,

@@ -3,7 +3,7 @@
 
 #include "typedefs.h"
 
-#include "furn_dat.h"
+#include "ingame/map/furn_types.h"
 
 typedef struct {
 	float pos_x;
