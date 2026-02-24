@@ -32,8 +32,11 @@
 #include "os/eeiop/se_srund.h"
 #include "os/eeiop/se_trans.h"
 
+#include "mikupan/mikupan_memory.h"
+
 #include <math.h>
 #include <string.h>
+#include <stdint.h>
 
 static short int SearchAcDoor(int door_id);
 static short int SearchNcDoor(int door_id);

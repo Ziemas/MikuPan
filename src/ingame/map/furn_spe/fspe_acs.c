@@ -2,6 +2,7 @@
 #include "furn_spe.h"
 #include "typedefs.h"
 #include <stdint.h>
+#include "mikupan/mikupan_memory.h"
 
 #define BASE_ADDRESS 0x7f8000
 
