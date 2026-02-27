@@ -32,11 +32,6 @@ mat4 WorldView = {0};
 
 SDL_AppResult MikuPan_Init()
 {
-#ifdef SDL_PLATFORM_LINUX
-    setenv("SDL_VIDEO_WAYLAND_WMCLASS", "MikuPan", 0);
-    setenv("SDL_VIDEO_X11_WMCLASS",     "MikuPan", 0);
-#endif
-
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);

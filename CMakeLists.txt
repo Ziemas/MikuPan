@@ -21,7 +21,8 @@ include(imgui)
 include(spdlog)
 include(cglm)
 
-set(MIKUPAN_SOURCES "src/mikupan/mikupan_file.cpp"
+set(MIKUPAN_SOURCES
+        "src/mikupan/mikupan_file.cpp"
         "src/common/ul_math.c"
         "src/common/utility.c"
         "src/edit/test_2d.c"
@@ -235,7 +236,7 @@ set(MIKUPAN_SOURCES "src/mikupan/mikupan_file.cpp"
         src/ingame/map/furn_spe/fsla_dat.c
 )
 
-add_executable(MikuPan ${MIKUPAN_SOURCES})
+add_executable(MikuPan ${MIKUPAN_SOURCES} ${APP_ICON_RESOURCE_WINDOWS})
 
 target_include_directories(MikuPan PRIVATE "sdk/" "src" "extern/" "extern/glad/include/" ${SDL3_INCLUDE_DIR})
 
