@@ -22,6 +22,7 @@
 
 int window_width = 640;
 int window_height = 448;
+int vertex_index[1024 * 1024] = {0};
 
 SDL_Window *window = NULL;
 MikuPan_TextureInfo *fnt_texture[6] = {0};
@@ -29,6 +30,7 @@ MikuPan_TextureInfo *curr_fnt_texture = NULL;
 
 mat4 WorldScreen = {0};
 mat4 WorldView = {0};
+mat4 projection = {0};
 
 SDL_AppResult MikuPan_Init()
 {
@@ -48,15 +50,15 @@ SDL_AppResult MikuPan_Init()
         return SDL_APP_FAILURE;
     }
 
-    SDL_SetHint(SDL_HINT_MAIN_CALLBACK_RATE, "60");
+    //SDL_SetHint(SDL_HINT_MAIN_CALLBACK_RATE, "60");
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    //SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 2);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 8);
 
     info_log("Loading SDL_GameControllerDB");
 
@@ -653,7 +655,6 @@ void MikuPan_Camera(SgCAMERA *camera)
     glm_lookat(camera->p, center, up, WorldView);
 
     // Projection -> camera->vcv
-    mat4 projection = {0};
     float aspect = (float) window_width / (float) window_height;
     glm_perspective(camera->fov, aspect, 10.0f, camera->farz,
                     projection);
@@ -679,6 +680,8 @@ void MikuPan_SetupMirrorMtx(float* mtx)
 
     glm_mat4_make(mtx, m);
     glm_mat4_mul(WorldView, m, out);
+
+    glm_mat4_mul(projection, out, WorldScreen);
 
     MikuPan_SetUniformMatrix4fvToAllShaders((float*)out, "view");
 }
@@ -748,7 +751,7 @@ void MikuPan_RenderMeshType0x32(struct SGDPROCUNITHEADER *pVUVN,
     glad_glEnable(GL_PRIMITIVE_RESTART);
     glad_glPrimitiveRestartIndex(0xFFFFFFFF);
 
-    int vertex_index[1024 * 1024];
+
 
     if (GET_NUM_MESH(pPUHead) * pVUVN->VUVNDesc.sNumVertex * 4 > (1024 * 1024))
     {
@@ -885,8 +888,6 @@ void MikuPan_RenderMeshType0x2(struct SGDPROCUNITHEADER *pVUVN,
 
     glad_glEnable(GL_PRIMITIVE_RESTART);
     glad_glPrimitiveRestartIndex(0xFFFFFFFF);
-
-    int vertex_index[1024 * 1024];
 
     if (GET_NUM_MESH(pPUHead) * pVUVN->VUVNDesc.sNumVertex * 4 > (1024 * 1024))
     {

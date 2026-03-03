@@ -2159,8 +2159,6 @@ int CheckModelBoundingBox(sceVu0FMATRIX lwmtx, sceVu0FVECTOR *bbox)
     tmpvec = (sceVu0FVECTOR *)&ps2_virtual_scratchpad[0x620];
     ed = (sceVu0FVECTOR *)&ps2_virtual_scratchpad[0x6a0]; // `ed[i]` can be replaced with `tmpvec[8+i]`
 
-    mat4 m = {0};
-
     _SetMulMatrix(*(sceVu0FMATRIX*)MikuPan_GetWorldScreenMatrix(), lwmtx);
     //_SetMulMatrix(SgCMVtx, lwmtx);
 
@@ -2168,7 +2166,7 @@ int CheckModelBoundingBox(sceVu0FMATRIX lwmtx, sceVu0FVECTOR *bbox)
     DrawBoundingBox(bbox);
 
     /// Enabling makes it so the model is always drawn
-    return 1;
+    //return 1;
 
     if (clip_value_check != 0)
     {
