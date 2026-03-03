@@ -1,5 +1,5 @@
-#include "common.h"
 #include "typedefs.h"
+#include "common.h"
 #include "enums.h"
 #include "main.h"
 #include <string.h>
@@ -121,7 +121,12 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 void SDL_AppQuit(void *appstate, SDL_AppResult result)
 {
     IopShutDown();
-    MikuPan_ShutDownUi();
+
+    if (result == SDL_APP_SUCCESS)
+    {
+        MikuPan_ShutDownUi();
+    }
+
     MikuPan_Shutdown();
 }
 

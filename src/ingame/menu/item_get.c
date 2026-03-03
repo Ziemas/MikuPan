@@ -256,7 +256,7 @@ static void BookGetDsp(u_char model_type, u_char model_no, u_char msg0_no, u_cha
     u_char msg_dsp;
     u_char str_dsp;
     u_char msg_type;
-    u_char msg_no;
+    u_char msg_no = 0;
     u_char file_pct;
 
     msg_type = model_type;

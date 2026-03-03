@@ -1,27 +1,28 @@
-#include "common.h"
 #include "ev_load.h"
-#include "main/glob.h"
-#include "ingame/ig_glob.h"
+#include "common.h"
 #include "enums.h"
 #include "ev_spcl.h"
-#include "ingame/map/map_area.h"
-#include "ingame/entry/entry.h"
-#include "mikupan/mikupan_memory.h"
 #include "graphics/graph2d/effect_ene.h"
 #include "graphics/graph2d/tim2.h"
 #include "graphics/motion/mdlwork.h"
 #include "ingame/entry/ap_dgost.h"
 #include "ingame/entry/ap_fgost.h"
 #include "ingame/entry/ap_ggost.h"
+#include "ingame/entry/entry.h"
+#include "ingame/ig_glob.h"
 #include "ingame/map/door_ctl.h"
 #include "ingame/map/furn_ctl.h"
-#include "ingame/map/item_ctl.h"
-#include "ingame/map/map_ctrl.h"
 #include "ingame/map/furn_spe/fspe_acs.h"
-#include "os/eeiop/eese.h"
+#include "ingame/map/item_ctl.h"
+#include "ingame/map/map_area.h"
+#include "ingame/map/map_ctrl.h"
+#include "main/glob.h"
+#include "mikupan/mikupan_logging_c.h"
+#include "mikupan/mikupan_memory.h"
 #include "os/eeiop/adpcm/ea_cmd.h"
 #include "os/eeiop/adpcm/ea_ctrl.h"
 #include "os/eeiop/cdvd/eecdvd.h"
+#include "os/eeiop/eese.h"
 #include "outgame/btl_mode/btl_menu.h"
 
 #include <graphics/scene/scene.h>
@@ -3229,7 +3230,7 @@ u_int GetLoadDataAddr(u_short file_no)
 
 void SortLoadDataAddr()
 {
-    info_log("SORT LOAD DATA ADDR \n");
+    info_log("SORT LOAD DATA ADDR ");
 }
 
 void MissionTitleDisp(int msn_no)

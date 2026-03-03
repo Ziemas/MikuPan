@@ -145,13 +145,13 @@ static inline void inline_asm__mirror_c_line_120(Q_WORDDATA base, sceVu0FVECTOR 
     tmp0[2] *= r;
 
     /// TODO : CHECK MORE INDEPTH THIS HERE, CAUSES CRASHES
-    //base.iv[0] = tmp0[0] * 16.0f > (float)INT_MAX ? INT_MAX - 1 : FLT_TO_FIX4(tmp0[0]);
-    //base.iv[1] = tmp0[1] * 16.0f > (float)INT_MAX ? INT_MAX - 1 : FLT_TO_FIX4(tmp0[1]);
-    //base.iv[2] = tmp0[2] * 16.0f > (float)INT_MAX ? INT_MAX - 1 : FLT_TO_FIX4(tmp0[2]);
+    base.iv[0] = FLT_TO_FIX4(tmp0[0]);
+    base.iv[1] = FLT_TO_FIX4(tmp0[1]);
+    base.iv[2] = FLT_TO_FIX4(tmp0[2]);
 
-    base.fv[0] = tmp0[0] * 16.0f;
-    base.fv[1] = tmp0[1] * 16.0f;
-    base.fv[2] = tmp0[2] * 16.0f;
+    //base.fv[0] = tmp0[0] * 16.0f;
+    //base.fv[1] = tmp0[1] * 16.0f;
+    //base.fv[2] = tmp0[2] * 16.0f;
 
     // Gets skipped, actually so the value should be unused as it's undefined
     // base.i[3] = FLT_TO_FIX4(tmp0[3] * r);
@@ -193,6 +193,8 @@ int CheckMirrorModel(void *sgd_top)
         //prim = (u_int *)prim[0];
         prim = GetNextProcUnitHeaderPtr(prim);
     }
+
+    return 0;
 }
 
 static inline void inline_asm__mirror_c_line_207(MNODE *dst, MNODE *src)
@@ -607,7 +609,8 @@ int MakeMirrorEnvironment(u_int *prim)
             break;
     }
 
-    /// TODO: RE-ENABLE THIS!
+    /// Removed code because modern PCs are strong enough to render entire room
+    /// in the mirror
     //if (disp_flg == 0)
     //{
     //    return 0;
@@ -687,7 +690,7 @@ void MirrorPrim(u_int *prim)
 int PreMirrorPrim(SgCAMERA *camera, u_int *prim)
 {
     sceVu0FMATRIX tmpmat;
-    int mir_flag;
+    int mir_flag = 0;
 
     if (prim == NULL)
     {
@@ -718,6 +721,12 @@ int PreMirrorPrim(SgCAMERA *camera, u_int *prim)
                 break;
             case 4:
                 mir_flag = CheckBoundingBox(prim);
+
+                if (mir_flag == 0)
+                {
+                    return 0;
+                }
+
                 _MulMatrix(*(sceVu0FMATRIX *) &SCRATCHPAD[0xd0], SgCMVtx, *(sceVu0FMATRIX *) &SCRATCHPAD[0x430]);
                 break;
         }
@@ -865,8 +874,6 @@ void CalcMirrorMatrix(SgCAMERA *camera)
     Vu0CopyVector(mir_norm, norm);
 
     Vu0CopyMatrix(mir_mtx, tmpmat);
-
-    MikuPan_SetupMirrorMtx((float*)mir_mtx);
 }
 
 void MirrorDraw(SgCAMERA *camera, void *sgd_top,
@@ -1028,6 +1035,8 @@ void MirrorRender(SgCAMERA *camera,
 
     SgSetRefCamera(&mir_camera);
     CalcMirrorMatrix(camera);
+
+    MikuPan_SetupMirrorMtx((float*)mir_mtx);
 
     sceVu0MulMatrix(mir_camera.ws, mir_camera.ws, mir_mtx);
     sceVu0MulMatrix(mir_camera.wc, mir_camera.wc, mir_mtx);

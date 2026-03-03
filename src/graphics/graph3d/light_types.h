@@ -1,7 +1,6 @@
 #ifndef GRAPHICS_GRAPH3D_LIGHT_TYPES_H
 #define GRAPHICS_GRAPH3D_LIGHT_TYPES_H
 
-#include "common.h"
 #include "typedefs.h"
 
 typedef struct {

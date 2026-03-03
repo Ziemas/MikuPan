@@ -166,9 +166,9 @@ void SortUnitRefCoordP(void *sgd_top, SgCOORDUNIT *coordp, int pnum)
 
     lcp = coordp;
 
-    if (((u_int)coordp % 16)) // checking alignment? coordp->matrix is a sceVu0FMATRIX and should be 16 aligned!
+    if (((int64_t)coordp % 16)) // checking alignment? coordp->matrix is a sceVu0FMATRIX and should be 16 aligned!
     {
-        info_log("SgSortUnitP Data broken. %x", (u_int)sgd_top);
+        info_log("SgSortUnitP Data broken. %x", (int64_t)sgd_top);
         return;
     }
 

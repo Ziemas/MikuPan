@@ -252,6 +252,8 @@ MikuPan_PipelineInfo* MikuPan_GetPipelineInfo(enum MikuPan_PipelineType pipeline
 void MikuPan_SetRenderState3D()
 {
     glad_glEnable(GL_CULL_FACE);
+    //glad_glCullFace(GL_BACK);
+    //glad_glFrontFace(GL_CCW);
     glad_glEnable(GL_DEPTH_TEST);
     glad_glDepthFunc(GL_LEQUAL);
 }
@@ -260,6 +262,7 @@ void MikuPan_SetRenderState3DMirror()
 {
     MikuPan_SetRenderState3D();
     glad_glCullFace(GL_FRONT);
+    //glad_glFrontFace(GL_CW);
 }
 
 void MikuPan_SetRenderState2D()

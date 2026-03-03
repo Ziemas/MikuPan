@@ -289,20 +289,20 @@ int AreaRoomAllLoad(u_char area_no)
     return 0;
 }
 
-int GetEmptyRoomAddr()
+int64_t GetEmptyRoomAddr()
 {
     int i;
 
     if (sys_wrk.game_mode != GAME_MODE_INGAME)
     {
-        return ROOM_DATA_ADDRESS;
+        return MikuPan_GetHostAddress(ROOM_DATA_ADDRESS);
     }
 
     for (i = 0; i < 2; i++)
     {
         if (plyr_wrk.pr_info.room_no != area_wrk.room[i])
         {
-            return i * ROOM_DATA_SIZE + ROOM_DATA_ADDRESS;
+            return MikuPan_GetHostAddress(i * ROOM_DATA_SIZE + ROOM_DATA_ADDRESS);
         }
     }
 

@@ -1,6 +1,5 @@
 #ifndef TYPEDEFS_H 
 #define TYPEDEFS_H
-#include <stdint.h>
 
 #ifdef _MSC_VER
 #define ATTRIBUTE_ALIGNED(x, decl) __declspec(align(x)) decl
@@ -10,6 +9,8 @@
 
 
 #define __u_char_defined
+
+#include <stdint.h>
 
 typedef long s_long;
 typedef short s_short;

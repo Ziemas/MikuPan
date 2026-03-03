@@ -45,10 +45,11 @@
 #include "menu/gameover.h"
 #include "menu/ig_spd_menu.h"
 #include "menu/item.h"
+#include "menu/item_get.h"
 #include "menu/pause.h"
 #include "menu/sp_menu.h"
-#include "os/key_cnf.h"
 #include "os/eeiop/cdvd/eecdvd.h"
+#include "os/key_cnf.h"
 #include "plyr/time_ctl.h"
 
 int start_msn = 0;

@@ -1,3 +1,4 @@
+#include "typedefs.h"
 #include "glob.h"
 
 u_int realtime_scene_flg = 0; // sdata

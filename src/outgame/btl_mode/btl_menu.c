@@ -29,6 +29,8 @@
 #include "outgame/btl_mode/btl_mode.h"
 #include "outgame/outgame.h"
 
+#include <string.h>
+
 MSN_LOAD_DAT stage_load_dat0[] = {
     {
      .file_no = 26,

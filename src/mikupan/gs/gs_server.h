@@ -133,7 +133,7 @@ class GSHelper
     void Clear();
 
    private:
-    std::vector<char> mem_;
+    std::vector<char> mem_ = std::vector<char> (4 * 1024 * 1024);
 };
 }// namespace GS
 

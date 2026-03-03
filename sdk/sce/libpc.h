@@ -59,4 +59,4 @@ static inline int scePcGetCounter0(void) {
 void scePcStart(int control, int counter0, int counter1);
 void scePcStop();
 
-#endif SCE_LIBPC_H
+#endif

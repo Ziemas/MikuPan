@@ -476,6 +476,11 @@ void ScenePrerender()
 
     disp_room = room_wrk.disp_no[1];
 
+    if (disp_room >= 64)
+    {
+        return;
+    }
+
     if (disp_room != 0xff || room_addr_tbl[disp_room].near_sgd == NULL)
     {
         SgReadLights(room_addr_tbl[disp_room].near_sgd, room_addr_tbl[disp_room].lit_data, ambient, ilights, 3, plights, 16, slights, 16);
@@ -490,7 +495,6 @@ void ScenePrerender()
 
         if (tmpModelp != NULL)
         {
-
             SgClearPreRender(tmpModelp, -1);
             SgPreRender(tmpModelp, -1);
         }
@@ -858,8 +862,8 @@ void gra3dInitFirst()
     runit_mtx[1][1] = 25.0f;
     runit_mtx[2][2] = 25.0f;
 
-    SgSetPacketBuffer(MikuPan_GetHostAddress(OBJ_WRK_ADDRESS), 0x17830, tag_buffer, 0x1800);
-    SgSetVNBuffer((sceVu0FVECTOR *)MikuPan_GetHostAddress(VNBufferAddress), 4000);
+    SgSetPacketBuffer(MikuPan_GetHostPointer(OBJ_WRK_ADDRESS), 0x17830, tag_buffer, 0x1800);
+    SgSetVNBuffer((sceVu0FVECTOR *)MikuPan_GetHostPointer(VNBufferAddress), 4000);
 
     SgInit3D();
     objInit();
@@ -2155,7 +2159,10 @@ int CheckModelBoundingBox(sceVu0FMATRIX lwmtx, sceVu0FVECTOR *bbox)
     tmpvec = (sceVu0FVECTOR *)&ps2_virtual_scratchpad[0x620];
     ed = (sceVu0FVECTOR *)&ps2_virtual_scratchpad[0x6a0]; // `ed[i]` can be replaced with `tmpvec[8+i]`
 
-    _SetMulMatrix(SgCMVtx, lwmtx);
+    mat4 m = {0};
+
+    _SetMulMatrix(*(sceVu0FMATRIX*)MikuPan_GetWorldScreenMatrix(), lwmtx);
+    //_SetMulMatrix(SgCMVtx, lwmtx);
 
     MikuPan_SetModelTransformMatrix(lwmtx);
     DrawBoundingBox(bbox);

@@ -2122,7 +2122,7 @@ int ChkChrNumUS(u_char msg_knd, u_char msg_no)
     return width;
 }
 
-char ChkPageYW(u_char msg_knd, u_char msg_no)
+char ChkPageYW(const u_char msg_knd, const u_char msg_no)
 {
     u_char *chk_str;
     u_char *nxt_str;

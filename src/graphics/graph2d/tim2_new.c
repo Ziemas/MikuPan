@@ -13,6 +13,7 @@
 #include "graphics/graph3d/sgdma.h"
 #include "main/glob.h"
 #include "mikupan/gs/gs_server_c.h"
+#include "mikupan/gs/mikupan_texture_manager_c.h"
 #include "mikupan/mikupan_memory.h"
 #include "mikupan/rendering/mikupan_renderer.h"
 
@@ -439,7 +440,7 @@ void MakeTim2Direct3(u_int *tim2_addr, int tbp, int offset)
         tbp = sgtx0.TBP0 + offset;
     }
 
-    sceGsLoadImage load_image;
+    sceGsLoadImage load_image = {0};
 
     qwtop = ndpkt++;
 
@@ -488,7 +489,10 @@ void MakeTim2Direct3(u_int *tim2_addr, int tbp, int offset)
     pbuf[ndpkt++].ul64[1] = SCE_GIF_PACKED_AD;
     *(u_long*)&load_image.giftag1 = SCE_GIF_SET_TAG(nloop, SCE_GS_TRUE, SCE_GS_FALSE, 0, SCE_GIF_IMAGE, 1);
 
-    GsUpload(&load_image, (unsigned char*)img_addr);
+    if (MikuPan_GetTextureInfo(&sgtx0) == NULL)
+    {
+        GsUpload(&load_image, (unsigned char*)img_addr);
+    }
 
     qwc = (ndpkt - qwtop) - 1;
 
@@ -509,7 +513,7 @@ void MakeClutDirect3(u_int *tim2_addr, int cbp, int offset)
     u_int *img_addr;
     u_int qwc;
     u_int nloop;
-    sceGsTex0 sgtx0;
+    sceGsTex0 sgtx0= {0};
     int qwtop;
     TIM2_FILEHEADER *tfh;
 
@@ -600,7 +604,10 @@ void MakeClutDirect3(u_int *tim2_addr, int cbp, int offset)
     pbuf[ndpkt++].ul64[1] = SCE_GIF_PACKED_AD;
     *(u_long*)&load_image.giftag1 = SCE_GIF_SET_TAG(nloop, SCE_GS_TRUE, SCE_GS_FALSE, 0, SCE_GIF_IMAGE, 1);
 
-    GsUpload(&load_image, (unsigned char*)img_addr);
+    if (MikuPan_GetTextureInfo(&sgtx0) == NULL)
+    {
+        GsUpload(&load_image, (unsigned char*)img_addr);
+    }
 
     qwc = (ndpkt - qwtop) - 1;
 

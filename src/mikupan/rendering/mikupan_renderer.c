@@ -33,7 +33,7 @@ mat4 WorldView = {0};
 SDL_AppResult MikuPan_Init()
 {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
@@ -51,7 +51,10 @@ SDL_AppResult MikuPan_Init()
     SDL_SetHint(SDL_HINT_MAIN_CALLBACK_RATE, "60");
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 2);
 
@@ -714,70 +717,82 @@ void MikuPan_RenderMeshType0x32(struct SGDPROCUNITHEADER *pVUVN,
         (struct _SGDVUMESHCOLORDATA
              *) (&pPUHead->pNext + pProcData->VUMeshData_Preset.sOffsetToPrim);
 
-    int vertexOffset = 0;
-
     glad_glBindVertexArray(pipeline->vao);
 
-    /// TYPE0 (0x10) Requires
     sceGsTex0 *mesh_tex_reg = (sceGsTex0 *) ((int64_t) pProcData + 0x28);
     MikuPan_SetTexture(mesh_tex_reg);
-
     MikuPan_SetRenderState3D();
+
+    GLfloat *vertices = NULL;
+    GLfloat *normals = NULL;
+
+    if (GET_MESH_TYPE(pPUHead) == 0x32)
+    {
+        vertices =
+            (GLfloat *) (pVUVNData->VUVNData_Preset.aui
+                         + (pVUVN->VUVNDesc.sNumNormal) * 3
+                         + 10);
+    }
+    else if (GET_MESH_TYPE(pPUHead) == 0x12 || GET_MESH_TYPE(pPUHead) == 0x10)
+    {
+        vertices = ((float *) &(((int *) pVUVN)[14]));
+    }
+
+    size_t byte_size = pVUVN->VUVNDesc.sNumVertex * pipeline->buffers[0].attributes[0].stride;
+    glad_glBindBuffer(GL_ARRAY_BUFFER, pipeline->buffers[0].id);
+    glad_glBufferSubData(GL_ARRAY_BUFFER, 0, byte_size, vertices);
+
+    glad_glBindBuffer(GL_ARRAY_BUFFER, pipeline->buffers[1].id);
+    int vertex_offset = 0;
+
+    glad_glEnable(GL_PRIMITIVE_RESTART);
+    glad_glPrimitiveRestartIndex(0xFFFFFFFF);
+
+    int vertex_index[1024 * 1024];
+
+    if (GET_NUM_MESH(pPUHead) * pVUVN->VUVNDesc.sNumVertex * 4 > (1024 * 1024))
+    {
+        info_log("OVERFLOW!");
+    }
 
     for (int i = 0; i < GET_NUM_MESH(pPUHead); i++)
     {
-        pVMCD =
-            (struct _SGDVUMESHCOLORDATA *) GetNextUnpackAddr((u_int *) pVMCD);
+        pVMCD = (struct _SGDVUMESHCOLORDATA *) GetNextUnpackAddr((u_int *) pVMCD);
+        int vertex_count = pVMCD->VifUnpack.NUM;
 
-        GLfloat *vertices = NULL;
-        GLfloat *normals = NULL;
-
-        size_t vertexCount = pVMCD->VifUnpack.NUM;
-        size_t byteSize = vertexCount * pipeline->buffers[0].attributes[0].stride;
-        MikuPan_FixUV((float*)&sgdMeshData->astData, vertexCount);
-
-        if (GET_MESH_TYPE(pPUHead) == 0x32)
+        for (int j = 0; j < vertex_count; j++)
         {
-            vertices =
-                (GLfloat *) (pVUVNData->VUVNData_Preset.aui
-                             + (vertexOffset + pVUVN->VUVNDesc.sNumNormal) * 3
-                             + 10);
-
-            normals = (GLfloat *) (pVUVNData->VUVNData_Preset.aui
-                                   + (i * 3)
-                                   + 10);
-        }
-        else if (GET_MESH_TYPE(pPUHead) == 0x12 || GET_MESH_TYPE(pPUHead) == 0x10)
-        {
-            vertices = &((float *) &(((int *) pVUVN)[14]))[vertexOffset * 6];
+            vertex_index[vertex_offset + j + i] = vertex_offset + j;
         }
 
-        glad_glBindBuffer(GL_ARRAY_BUFFER, pipeline->buffers[0].id);
-        glad_glBufferSubData(GL_ARRAY_BUFFER, 0, byteSize, vertices);
+        vertex_index[vertex_offset + vertex_count + i] = 0xFFFFFFFF;
 
-        glad_glBindBuffer(GL_ARRAY_BUFFER, pipeline->buffers[1].id);
+        MikuPan_FixUV((float*)&sgdMeshData->astData, vertex_count);
+
         glad_glBufferSubData(
             GL_ARRAY_BUFFER,
-            pipeline->buffers[1].attributes[0].offset,
-            vertexCount * pipeline->buffers[1].attributes[0].stride,
+            pipeline->buffers[1].attributes[0].stride * vertex_offset,
+            vertex_count * pipeline->buffers[1].attributes[0].stride,
             sgdMeshData->astData);
 
         if (GET_MESH_TYPE(pPUHead) == 0x32)
         {
+            normals = (GLfloat *) (pVUVNData->VUVNData_Preset.aui
+                               + (i * 3)
+                               + 10);
             u_int loc = glad_glGetUniformLocation(current_program, "aNormal");
             glad_glUniform3fv(loc, 1, (float *) normals);
         }
 
-        //info_log("Mesh render vertex count %d", pVMCD->VifUnpack.NUM);
+        //glad_glDrawArrays(MikuPan_GetRenderMode(), vertex_offset, vertex_count);
 
-        glad_glDrawArrays(MikuPan_GetRenderMode(), 0, vertexCount);
-
-        sgdMeshData = (struct SGDVUMESHSTDATA *) &sgdMeshData
-                          ->astData[pVMCD->VifUnpack.NUM];
-        vertexOffset += pVMCD->VifUnpack.NUM;
-        pVMCD = (struct _SGDVUMESHCOLORDATA *) &pVMCD
-                    ->avColor[pVMCD->VifUnpack.NUM];
+        vertex_offset += vertex_count;
+        sgdMeshData = (struct SGDVUMESHSTDATA *) &sgdMeshData->astData[vertex_count];
+        pVMCD = (struct _SGDVUMESHCOLORDATA *) &pVMCD->avColor[vertex_count];
     }
+
+    //glad_glDrawArrays(MikuPan_GetRenderMode(), 0, pVUVN->VUVNDesc.sNumVertex);
+    glad_glDrawElements(MikuPan_GetRenderMode(), pVUVN->VUVNDesc.sNumVertex + GET_NUM_MESH(pPUHead), GL_UNSIGNED_INT, vertex_index);
 }
 
 void MikuPan_RenderMeshType0x82(unsigned int *pVUVN, unsigned int *pPUHead)
@@ -857,31 +872,53 @@ void MikuPan_RenderMeshType0x2(struct SGDPROCUNITHEADER *pVUVN,
 
     MikuPan_SetRenderState3D();
 
+    glad_glBindBuffer(GL_ARRAY_BUFFER, pipeline->buffers[0].id);
+    glad_glBufferSubData(
+        GL_ARRAY_BUFFER,
+        0,
+        v->vnum * pipeline->buffers[0].attributes[0].stride,
+        vertices);
+
+    glad_glBindBuffer(GL_ARRAY_BUFFER, pipeline->buffers[1].id);
+
+    int vertex_offset = 0;
+
+    glad_glEnable(GL_PRIMITIVE_RESTART);
+    glad_glPrimitiveRestartIndex(0xFFFFFFFF);
+
+    int vertex_index[1024 * 1024];
+
+    if (GET_NUM_MESH(pPUHead) * pVUVN->VUVNDesc.sNumVertex * 4 > (1024 * 1024))
+    {
+        info_log("OVERFLOW!");
+    }
+
     for (int i = 0; i < GET_NUM_MESH(pPUHead); i++)
     {
-        int vertexCount = pMeshInfo[i].uiPointNum;
+        int vertex_count = pMeshInfo[i].uiPointNum;
 
-        MikuPan_FixUV((float*)&sgdMeshData->astData, vertexCount);
+        MikuPan_FixUV((float*)&sgdMeshData->astData, vertex_count);
 
-        glad_glBindBuffer(GL_ARRAY_BUFFER, pipeline->buffers[0].id);
+        for (int j = 0; j < vertex_count; j++)
+        {
+            vertex_index[vertex_offset + j + i] = vertex_offset + j;
+        }
+
+        vertex_index[vertex_offset + vertex_count + i] = 0xFFFFFFFF;
+
         glad_glBufferSubData(
             GL_ARRAY_BUFFER,
-            0,
-            vertexCount * pipeline->buffers[0].attributes[0].stride,
-            vertices);
-
-        glad_glBindBuffer(GL_ARRAY_BUFFER, pipeline->buffers[1].id);
-        glad_glBufferSubData(
-            GL_ARRAY_BUFFER,
-            pipeline->buffers[1].attributes[0].offset,
-            vertexCount * pipeline->buffers[1].attributes[0].stride,
+            pipeline->buffers[1].attributes[0].stride * vertex_offset,
+            vertex_count * pipeline->buffers[1].attributes[0].stride,
             sgdMeshData->astData);
 
-        vertices = &vertices[vertexCount * 4 * 2];
+        //glad_glDrawArrays(MikuPan_GetRenderMode(), vertex_offset, vertex_count);
 
         sgdMeshData = (struct SGDVUMESHSTDATA *) &sgdMeshData
-                          ->astData[vertexCount];
-
-        glad_glDrawArrays(MikuPan_GetRenderMode(), 0, vertexCount);
+                          ->astData[vertex_count];
+        vertex_offset += vertex_count;
     }
+
+    //glad_glDrawArrays(MikuPan_GetRenderMode(), 0, v->nnum);
+    glad_glDrawElements(MikuPan_GetRenderMode(), v->nnum + GET_NUM_MESH(pPUHead), GL_UNSIGNED_INT, vertex_index);
 }

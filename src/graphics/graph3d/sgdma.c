@@ -14,6 +14,7 @@
 #include "graphics/graph3d/sglib.h"
 #include "graphics/graph3d/sgsu.h"
 #include "mikupan/gs/gs_server_c.h"
+#include "mikupan/gs/mikupan_texture_manager_c.h"
 #include "mikupan/mikupan_logging_c.h"
 #include "mikupan/mikupan_types.h"
 
@@ -307,6 +308,21 @@ void LoadTRI2Files(u_int *prim)
 
     /// SGDTRI2FILEHEADER
     prim = (u_int *)((int64_t)prim + 0x10 + (pads / 4) * 4);
+
+    /// New code added to check if the texture has already been uploaded once
+    //if (MikuPan_IsTextureCacheFlushRequested() == 1)
+    //{
+    //    prim[0] = 0;
+    //    return;
+    //}
+    //else if (prim[0] == 1)
+    //{
+    //    return;
+    //}
+    //else
+    //{
+    //    prim[0] = 1;
+    //}
 
     prim[2] = 0x11000000;
 

@@ -71,6 +71,11 @@ void MikuPan_FlushTextureCache()
     request_texture_cache_flush = false;
 }
 
+int MikuPan_IsTextureCacheFlushRequested()
+{
+    return request_texture_cache_flush;
+}
+
 void MikuPan_RequestFlushTextureCache()
 {
     request_texture_cache_flush = true;

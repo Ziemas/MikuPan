@@ -1,9 +1,8 @@
 #ifndef SCE_MPEG_DEFS_H
 #define SCE_MPEG_DEFS_H
 
-#include <stdint.h>
-
 #include "typedefs.h"
+#include <stdint.h>
 
 #ifdef BUILD_EU_VERSION
 #define MAX_WIDTH 640

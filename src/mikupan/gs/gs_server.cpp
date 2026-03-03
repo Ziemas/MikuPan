@@ -84,6 +84,7 @@ void GS::GSHelper::UploadPSMCT32(int dbp, int dbw, int dsax, int dsay, int rrw,
                                  int rrh, const uint8_t *inbuf)
 {
     int src_addr = 0;
+
     for (int y = dsay; y < dsay + rrh; ++y)
     {
         for (int x = dsax; x < dsax + rrw; ++x)
@@ -102,6 +103,7 @@ void GS::GSHelper::UploadPSMT8(int dbp, int dbw, int dsax, int dsay, int rrw,
                                int rrh, const uint8_t *inbuf)
 {
     int src_addr = 0;
+
     for (int y = dsay; y < dsay + rrh; ++y)
     {
         for (int x = dsax; x < dsax + rrw; ++x)
@@ -116,16 +118,14 @@ void GS::GSHelper::UploadPSMT4(int dbp, int dbw, int dsax, int dsay, int rrw,
                                int rrh, const uint8_t *inbuf)
 {
     int src_addr = 0;
+
     for (int y = dsay; y < dsay + rrh; ++y)
     {
         for (int x = dsax; x < dsax + rrw; ++x)
         {
             const int addr = GetPixelAddressPSMT4(dbp, dbw, x, y);
-            const int src_nibble =
-                (inbuf[src_addr >> 1] >> ((src_addr & 0x01) << 2)) & 0x0F;
-            mem_[addr >> 1] =
-                (src_nibble << ((addr & 0x01) << 2))
-                | (mem_[addr >> 1] & (0xF0 >> ((addr & 0x01) << 2)));
+            const int src_nibble = (inbuf[src_addr >> 1] >> ((src_addr & 0x01) << 2)) & 0x0F;
+            mem_[addr >> 1] = (src_nibble << ((addr & 0x01) << 2)) | (mem_[addr >> 1] & (0xF0 >> ((addr & 0x01) << 2)));
             src_addr++;
         }
     }
@@ -136,6 +136,7 @@ std::vector<uint8_t> GS::GSHelper::DownloadPSMCT32(int dbp, int dbw, int dsax,
 {
     std::vector<uint8_t> outbuf(rrw * rrh * 4);
     int dst_addr = 0;
+
     for (int y = dsay; y < dsay + rrh; ++y)
     {
         for (int x = dsax; x < dsax + rrw; ++x)
@@ -148,6 +149,7 @@ std::vector<uint8_t> GS::GSHelper::DownloadPSMCT32(int dbp, int dbw, int dsax,
             dst_addr += 0x04;
         }
     }
+
     return outbuf;
 }
 
@@ -172,15 +174,13 @@ std::vector<uint8_t> GS::GSHelper::DownloadImagePSMT8(int dbp, int dbw,
 {
     std::vector<uint8_t> outbuf(rrw * rrh * 4);
     int dst_addr = 0;
+
     for (int y = dsay; y < dsay + rrh; ++y)
     {
         for (int x = dsax; x < dsax + rrw; ++x)
         {
             const int addr = GetPixelAddressPSMT8(dbp, dbw, x, y);
             const int clut_index = mem_[addr];
-
-            //int cx = clut_index % 16;
-            //int cy = clut_index / 16;
 
             int cy = (clut_index & 0xE0) >> 4;
             int cx = clut_index & 0x07;
@@ -193,6 +193,7 @@ std::vector<uint8_t> GS::GSHelper::DownloadImagePSMT8(int dbp, int dbw,
             outbuf[dst_addr + 0x00] = mem_[p + 0x00];
             outbuf[dst_addr + 0x01] = mem_[p + 0x01];
             outbuf[dst_addr + 0x02] = mem_[p + 0x02];
+
             if (alpha_reg >= 0)
             {
                 outbuf[dst_addr + 0x03] = alpha_reg;
@@ -202,9 +203,11 @@ std::vector<uint8_t> GS::GSHelper::DownloadImagePSMT8(int dbp, int dbw,
                 const char src_alpha = mem_[p + 0x03];
                 outbuf[dst_addr + 0x03] = src_alpha;
             }
+
             dst_addr += 4;
         }
     }
+
     return outbuf;
 }
 
@@ -216,13 +219,13 @@ std::vector<uint8_t> GS::GSHelper::DownloadImagePSMT4(int dbp, int dbw,
 {
     std::vector<uint8_t> outbuf(rrw * rrh * 4);
     int dst_addr = 0;
+
     for (int y = dsay; y < dsay + rrh; ++y)
     {
         for (int x = dsax; x < dsax + rrw; ++x)
         {
             const int addr = GetPixelAddressPSMT4(dbp, dbw, x, y);
-            const int clut_index =
-                (mem_[addr >> 1] >> ((addr & 0x01) << 2)) & 0x0F;
+            const int clut_index = (mem_[addr >> 1] >> ((addr & 0x01) << 2)) & 0x0F;
 
             const int cy = ((clut_index >> 3) & 0x01) + (csa & 0x0E);
             const int cx = (clut_index & 0x07) + ((csa & 0x01) << 3);
@@ -231,6 +234,7 @@ std::vector<uint8_t> GS::GSHelper::DownloadImagePSMT4(int dbp, int dbw,
             outbuf[dst_addr + 0x00] = mem_[p + 0x00];
             outbuf[dst_addr + 0x01] = mem_[p + 0x01];
             outbuf[dst_addr + 0x02] = mem_[p + 0x02];
+
             if (alpha_reg >= 0)
             {
                 outbuf[dst_addr + 0x03] = alpha_reg;
@@ -238,12 +242,13 @@ std::vector<uint8_t> GS::GSHelper::DownloadImagePSMT4(int dbp, int dbw,
             else
             {
                 const char src_alpha = mem_[p + 0x03];
-                outbuf[dst_addr + 0x03] =
-                    src_alpha;// >= 0 ? (src_alpha << 1) : 0xFF;
+                outbuf[dst_addr + 0x03] = src_alpha;// >= 0 ? (src_alpha << 1) : 0xFF;
             }
+
             dst_addr += 4;
         }
     }
+    
     return outbuf;
 }
 
@@ -348,7 +353,6 @@ unsigned char *DownloadGsTexture(sceGsTex0 *tex0)
                                               width, height, tex0->CBP,
                                               tex0->TBW, tex0->CSA, -1);
             break;
-        //default:
         case PSMT8:
             img =
                 gsHelper.DownloadImagePSMT8(tex0->TBP0, tex0->TBW, 0, 0, width,

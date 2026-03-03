@@ -7,6 +7,7 @@
 void MikuPan_AddTexture(sceGsTex0 *tex0, MikuPan_TextureInfo* texture_info);
 MikuPan_TextureInfo* MikuPan_GetTextureInfo(sceGsTex0* tex0);
 u_char* MikuPan_GetTexturePixelBuffer(sceGsTex0* tex0);
+int MikuPan_IsTextureCacheFlushRequested();
 void MikuPan_AddTexturePixelBuffer(sceGsTex0* tex0, unsigned char *img);
 void MikuPan_FirstUploadDone();
 int MikuPan_IsFirstUploadDone();

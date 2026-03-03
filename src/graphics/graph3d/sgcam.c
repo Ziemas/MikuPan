@@ -415,7 +415,8 @@ int CheckBoundingBox(u_int *prim)
 
     lcp[prim[2]].camin = 0;
 
-    asm_1__CheckBoundingBox(SgCMVtx, SgCMtx, lcp[prim[2]].lwmtx);
+    asm_1__CheckBoundingBox(*(sceVu0FMATRIX*)MikuPan_GetWorldScreenMatrix(), *(sceVu0FMATRIX*)MikuPan_GetWorldScreenMatrix(), lcp[prim[2]].lwmtx);
+    //asm_1__CheckBoundingBox(SgCMVtx, SgCMtx, lcp[prim[2]].lwmtx);
 
     MikuPan_SetModelTransform(&prim[1]);
     DrawBoundingBox((sceVu0FVECTOR*)&prim[4]);

@@ -16,6 +16,7 @@ extern "C"
     u_char* MikuPan_GetTexturePixelBuffer(sceGsTex0* tex0);
     void MikuPan_AddTexturePixelBuffer(sceGsTex0* tex0, unsigned char *img);
 
+    int MikuPan_IsTextureCacheFlushRequested();
     void MikuPan_FirstUploadDone();
     bool MikuPan_IsFirstUploadDone();
     void MikuPan_FlushTextureCache();
