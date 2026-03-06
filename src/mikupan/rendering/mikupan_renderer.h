@@ -1,17 +1,11 @@
 #ifndef MIKUPAN_SDL_RENDERER_H
 #define MIKUPAN_SDL_RENDERER_H
 #include "mikupan/mikupan_basictypes.h"
-#include <ingame/camera/camera.h>
-
-struct SGDPROCUNITHEADER;
-extern int window_width;
-extern int window_height;
+#include "mikupan/mikupan_types.h"
 #include "SDL3/SDL_init.h"
 #include "SDL3/SDL_video.h"
 #include "ee/eestruct.h"
 #include "graphics/graph2d/sprt.h"
-
-extern SDL_Window *window;
 
 typedef struct {
     sceVu0FVECTOR p;
@@ -70,9 +64,9 @@ void MikuPan_Setup3D();
 void MikuPan_Shutdown();
 void MikuPan_EndFrame();
 void MikuPan_SetModelTransformMatrix(sceVu0FVECTOR* m);
-void MikuPan_RenderMeshType0x32(struct SGDPROCUNITHEADER *pVUVN, struct SGDPROCUNITHEADER *pPUHead);
+void MikuPan_RenderMeshType0x32(SGDPROCUNITHEADER *pVUVN, SGDPROCUNITHEADER *pPUHead);
 void MikuPan_RenderMeshType0x82(unsigned int* pVUVN, unsigned int *pPUHead);
-void MikuPan_RenderMeshType0x2(struct SGDPROCUNITHEADER* pVUVN, struct SGDPROCUNITHEADER *pPUHead, float* vertices);
+void MikuPan_RenderMeshType0x2(SGDPROCUNITHEADER* pVUVN, SGDPROCUNITHEADER *pPUHead, float* vertices);
 
 
 #endif //MIKUPAN_SDL_RENDERER_H

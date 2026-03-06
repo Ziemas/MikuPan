@@ -16,6 +16,8 @@
 
 #include "data/room_name.h" // static char *room_name[];
 #include "sce/libvu0.h"
+
+#include <stdlib.h>
 static u_int *ldata_top;
 static u_int *pdata_top;
 static u_int *sdata_top;
@@ -36,7 +38,7 @@ void ReadLights(ROOM_LIGHT *rdata, void *buf)
     u_int *prim;
     sceVu0FVECTOR *pvec;
 
-    prim = (u_int *)((int *)buf)[6]; // structure ??
+    prim = (u_int *)MikuPan_GetHostPointer(((int *)buf)[6]); // structure ??
 
     rdata->sdata = NULL;
     rdata->pdata = NULL;
@@ -111,8 +113,18 @@ static void LoadLightData(DEBUG_MENU **dbgmenu_tbl, int disp_room)
             
         psubmenu->subnum = 4116;
         psubmenu->nmax = 0;
-        psubmenu->name = "Infinite";
-        
+
+        /// REALLY BAD CODE! It then tries to write content to that pointer
+        /// that is longer than the original code...
+        /// Also, that string goes into rdata which cannot be modified...
+        //psubmenu->name = "Infinite";
+
+        if (psubmenu->name == NULL)
+        {
+            psubmenu->name = malloc(sizeof("Infinite\0") + 20);
+            strcpy(psubmenu->name, "Infinite\0");
+        }
+
         for (i = 0; i < le_lights[0].num; i++)
         {
             psubmenu = &dbgmenu_tbl[20]->submenu[i];
@@ -139,6 +151,11 @@ static void LoadLightData(DEBUG_MENU **dbgmenu_tbl, int disp_room)
         for (i = 0; i < nnum; i++)
         {
             psubmenu = &dbgmenu_tbl[18]->submenu[sub_menu_num];
+
+            if (psubmenu->name == NULL)
+            {
+                psubmenu->name = malloc(sizeof("Point123456\0") + 20);
+            }
             
             sprintf(psubmenu->name, "Point%d", i);
             
@@ -156,6 +173,11 @@ static void LoadLightData(DEBUG_MENU **dbgmenu_tbl, int disp_room)
         for (i = 0; i < nnum; i++)
         {
             psubmenu = &dbgmenu_tbl[18]->submenu[sub_menu_num];
+
+            if (psubmenu->name == NULL)
+            {
+                psubmenu->name = malloc(sizeof("Point123456\0") + 20);
+            }
             
             sprintf(psubmenu->name, "Spot%d", i);
             
@@ -363,7 +385,8 @@ void ApplyLight(int room_no)
     {
         HeaderSection *h = mdl_addr;
 
-        cp = h->coordp;
+        cp = GetCoordP(h);
+        //cp = h->coordp;
 
         sceVu0UnitMatrix(cp->matrix);
         CalcCoordinate(cp, h->blocks - 1);
@@ -379,7 +402,8 @@ void ApplyLight(int room_no)
     {
         HeaderSection *h = mdl_addr;
 
-        cp = h->coordp;
+        cp = GetCoordP(h);
+        //cp = h->coordp;
         
         sceVu0UnitMatrix(cp->matrix);
         CalcCoordinate(cp, h->blocks - 1);
@@ -464,9 +488,9 @@ void MakeLightEditorData(DEBUG_MENU **dbgmenu_tbl, int now_tree)
         {
             psubmenu = &dbgmenu_tbl[21]->submenu[i - menu_end];
 
-            sprintf(psubmenu->name, "Point %d", i);
+            //sprintf(psubmenu->name, "Point %d", i);
 
-            psubmenu->nmax = NULL;
+            psubmenu->nmax = 0;
             psubmenu->subnum = 4122;
         }
 
@@ -474,7 +498,7 @@ void MakeLightEditorData(DEBUG_MENU **dbgmenu_tbl, int now_tree)
 
         psubmenu = &dbgmenu_tbl[21]->submenu[menu_start]; 
 
-        memcpy(psubmenu->name, "_end_", 6);
+        //memcpy(psubmenu->name, "_end_", 6);
 
         psubmenu->nmax = 0;
         psubmenu->subnum = 0;
@@ -495,7 +519,7 @@ void MakeLightEditorData(DEBUG_MENU **dbgmenu_tbl, int now_tree)
         {
             psubmenu = &dbgmenu_tbl[22]->submenu[i - menu_end];
 
-            sprintf(psubmenu->name, "Spot %d", i);
+            //sprintf(psubmenu->name, "Spot %d", i);
 
             psubmenu->nmax = 0;
             psubmenu->subnum = 0x101B;
@@ -505,7 +529,7 @@ void MakeLightEditorData(DEBUG_MENU **dbgmenu_tbl, int now_tree)
 
         psubmenu = &dbgmenu_tbl[22]->submenu[menu_start];
 
-        memcpy(psubmenu->name, "_end_", 6);
+        //memcpy(psubmenu->name, "_end_", 6);
 
         psubmenu->nmax = 0; 
         psubmenu->subnum = 0;
@@ -526,7 +550,7 @@ void MakeLightEditorData(DEBUG_MENU **dbgmenu_tbl, int now_tree)
         dbg_wrk.le_G = (plight->diffuse[1] * 100.0f) + 0.0001f;
         dbg_wrk.le_B = (plight->diffuse[2] * 100.0f) + 0.0001f; 
 
-        sprintf(dbgmenu_tbl[25]->title, "Infinite %d", dbg_wrk.light_infinite + loff);
+        //sprintf(dbgmenu_tbl[25]->title, "Infinite %d", dbg_wrk.light_infinite + loff);
     break;
     case 26:
         plight = &le_plights[dbg_wrk.light_point + loff];
@@ -538,7 +562,7 @@ void MakeLightEditorData(DEBUG_MENU **dbgmenu_tbl, int now_tree)
         dbg_wrk.le_power = (plight->power / plight->ambient[0]) + 0.0001f;  
         dbg_wrk.le_plen = ((plight->intens * 10.0f) / plight->ambient[0]) + 0.0001f; 
 
-        sprintf(dbgmenu_tbl[26]->title, "Point %d", dbg_wrk.light_point + loff);
+        //sprintf(dbgmenu_tbl[26]->title, "Point %d", dbg_wrk.light_point + loff);
     break;
     case 27:
         plight = &le_slights[dbg_wrk.light_spot + loff];
@@ -550,7 +574,7 @@ void MakeLightEditorData(DEBUG_MENU **dbgmenu_tbl, int now_tree)
         dbg_wrk.le_power = (plight->power / plight->ambient[0]) + 0.0001f;
         dbg_wrk.le_cone = plight->ambient[1] + 0.0001f;
 
-        sprintf(dbgmenu_tbl[27]->title, "Spot %d", dbg_wrk.light_spot + loff);  
+        //sprintf(dbgmenu_tbl[27]->title, "Spot %d", dbg_wrk.light_spot + loff);
     break;
     case 49:
         dbg_wrk.le_AR = (le_ambient[0] * 100.0f) + 0.0001f;

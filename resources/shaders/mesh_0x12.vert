@@ -13,6 +13,6 @@ out vec4 vNormal;
 void main()
 {
     vUV = aUV;
-    vNormal = model * vec4(aNormal, 1.0f);
+    vNormal = vec4(mat3(model) * aNormal, 1.0f);
     gl_Position = projection * view * model * vec4(aPos, 1.0f);
 }

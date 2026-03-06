@@ -400,7 +400,7 @@ void SetVUMeshData(u_int *prim)
             break;
         case 2:
             read_p = SetVUVNData(vuvnprim);
-            MikuPan_RenderMeshType0x2((struct SGDPROCUNITHEADER*)vuvnprim, (struct SGDPROCUNITHEADER*)prim, (float*)read_p);
+            MikuPan_RenderMeshType0x2((SGDPROCUNITHEADER*)vuvnprim, (SGDPROCUNITHEADER*)prim, (float*)read_p);
 
             read_p[0] = 0x14000000 | ((u_int) DRAWTYPE2 >> 3);
             read_p[1] = 0x17000000;
@@ -476,9 +476,9 @@ void SetVUMeshDataPost(u_int *prim)
         case 0:
             read_p = SetVUVNDataPost(vuvnprim);
 
-            MikuPan_SetWeightedMesh(1);
-            //MikuPan_RenderMeshType0x2((struct SGDPROCUNITHEADER*)vuvnprim, (struct SGDPROCUNITHEADER*)prim, (float*)read_p);
-            MikuPan_SetWeightedMesh(0);
+            //MikuPan_SetWeightedMesh(1);
+            //MikuPan_RenderMeshType0x2((SGDPROCUNITHEADER*)vuvnprim, (SGDPROCUNITHEADER*)prim, (float*)read_p);
+            //MikuPan_SetWeightedMesh(0);
 
             read_p[0] = 0x14000000 | ((u_int) DRAWTYPE0 >> 3);
             read_p[1] = 0x17000000;

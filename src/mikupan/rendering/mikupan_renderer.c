@@ -22,6 +22,7 @@
 int window_width = 640;
 int window_height = 448;
 int vertex_index[1024 * 1024] = {0};
+float temp_render_buffer[1024 * 1024] = {0};
 int state_changes = 0;
 int draw_calls = 0;
 
@@ -56,7 +57,7 @@ SDL_AppResult MikuPan_Init()
         return SDL_APP_FAILURE;
     }
 
-    //SDL_SetHint(SDL_HINT_MAIN_CALLBACK_RATE, "60");
+    SDL_SetHint(SDL_HINT_MAIN_CALLBACK_RATE, "60");
 
     MikuPan_SetupOpenGLContext();
 
@@ -116,7 +117,7 @@ void MikuPan_SetupOpenGLContext()
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 8);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 }
 
@@ -158,7 +159,7 @@ void MikuPan_SetupAmbientLighting()
         glad_glUniform3fv(
             glad_glGetUniformLocation(curr, "lightColor"),
             1,
-            TAmbient
+            MikuPan_GetLightColor()
             /* MikuPan_GetLightColor() */
             /* TAmbient */);
 
@@ -443,8 +444,15 @@ void MikuPan_RenderBoundingBox(sceVu0FVECTOR *vertices)
         return;
     }
 
-    MikuPan_SetShaderProgramWithBackup(BOUNDING_BOX_SHADER);
+    float bb_color[4] = {0.0f, 1.0f, 0.0f, 1.0f};
+
+    u_int curr = MikuPan_SetCurrentShaderProgram(BOUNDING_BOX_SHADER);
     MikuPan_PipelineInfo* pipeline = MikuPan_GetPipelineInfo(POSITION4);
+
+    glad_glUniform4fv(
+        glad_glGetUniformLocation(curr, "uColor"),
+        1,
+        bb_color);
 
     glad_glBindVertexArray(pipeline->vao);
     glad_glBindBuffer(GL_ARRAY_BUFFER, pipeline->buffers[0].id);
@@ -570,8 +578,7 @@ void MikuPan_SetupFntTexture()
     {
         if (fnt_texture[i] == NULL)
         {
-            fnt_texture[i] =
-                MikuPan_CreateGLTexture((sceGsTex0 *) &fntdat[i].tex0);
+            fnt_texture[i] = MikuPan_CreateGLTexture((sceGsTex0 *) &fntdat[i].tex0);
         }
     }
 
@@ -596,6 +603,7 @@ void MikuPan_SetWorldClipView()
 void MikuPan_SetModelTransformMatrix(sceVu0FVECTOR *m)
 {
     state_changes++;
+    MikuPan_SetupAmbientLighting();
     MikuPan_SetUniformMatrix4fvToAllShaders((float*)m, "model");
 }
 
@@ -620,15 +628,15 @@ void MikuPan_DeleteTexture(MikuPan_TextureInfo *texture_info)
 
 void MikuPan_Shutdown()
 {
-    // destroy the window
     SDL_DestroyWindow(window);
 }
 
 void MikuPan_EndFrame()
 {
-    info_log("Total state changes and draw calls this frame: %d, %d", state_changes, draw_calls);
+    //info_log("Total state changes and draw calls this frame: %d, %d", state_changes, draw_calls);
     draw_calls = 0;
     state_changes = 0;
+
     MikuPan_DrawUi();
     MikuPan_RenderUi();
     SDL_GL_SwapWindow(window);
@@ -704,41 +712,25 @@ void MikuPan_SetupMirrorMtx(float* mtx)
     MikuPan_SetUniformMatrix4fvToAllShaders((float*)out, "view");
 }
 
-void MikuPan_RenderMeshType0x32(struct SGDPROCUNITHEADER *pVUVN,
-                                struct SGDPROCUNITHEADER *pPUHead)
+void MikuPan_RenderMeshType0x32(SGDPROCUNITHEADER *pVUVN, SGDPROCUNITHEADER *pPUHead)
 {
-    MikuPan_SetupAmbientLighting();
+    char mesh_type = GET_MESH_TYPE(pPUHead);
 
-    MikuPan_PipelineInfo* pipeline;
-    if (GET_MESH_TYPE(pPUHead) == 0x32 && MikuPan_IsMesh0x32Rendering())
-    {
-        MikuPan_SetShaderProgramWithBackup(SIMPLE_TEXTURED_SHADER);
-        pipeline = MikuPan_GetPipelineInfo(POSITION3_UV);
-    }
-    else if ((GET_MESH_TYPE(pPUHead) == 0x12  || GET_MESH_TYPE(pPUHead) == 0x10) && MikuPan_IsMesh0x12Rendering())
-    {
-        MikuPan_SetShaderProgramWithBackup(MESH_0x12_SHADER);
-        pipeline = MikuPan_GetPipelineInfo(POSITION3_NORMAL3_UV);
-    }
-    else
+    if ((mesh_type != 0x12 && mesh_type != 0x10 && mesh_type != 0x32) ||
+        ((mesh_type == 0x12 || mesh_type == 0x10) && !MikuPan_IsMesh0x12Rendering()) ||
+        (mesh_type == 0x32 && !MikuPan_IsMesh0x32Rendering()))
     {
         return;
     }
 
-    u_int current_program = MikuPan_GetCurrentShaderProgram();
+    MikuPan_SetShaderProgramWithBackup(MESH_0x12_SHADER);
+    MikuPan_PipelineInfo* pipeline = MikuPan_GetPipelineInfo(POSITION3_NORMAL3_UV);
 
-    union SGDPROCUNITDATA *pVUVNData = (union SGDPROCUNITDATA *) &pVUVN[1];
-    union SGDPROCUNITDATA *pProcData = (union SGDPROCUNITDATA *) &pPUHead[1];
-
-    struct SGDVUMESHPOINTNUM *pMeshInfo =
-        (struct SGDVUMESHPOINTNUM *) &pPUHead[4];
-
-    struct SGDVUMESHSTDATA *sgdMeshData = (struct SGDVUMESHSTDATA *)
-    ((int64_t) pProcData + (pProcData->VUMeshData_Preset.sOffsetToST - 1) * 4);
-
-    struct _SGDVUMESHCOLORDATA *pVMCD =
-        (struct _SGDVUMESHCOLORDATA
-             *) (&pPUHead->pNext + pProcData->VUMeshData_Preset.sOffsetToPrim);
+    SGDPROCUNITDATA *pVUVNData = (SGDPROCUNITDATA *) &pVUVN[1];
+    SGDPROCUNITDATA *pProcData = (SGDPROCUNITDATA *) &pPUHead[1];
+    SGDVUMESHPOINTNUM *pMeshInfo = (SGDVUMESHPOINTNUM *) &pPUHead[4];
+    SGDVUMESHSTDATA *sgdMeshData = (SGDVUMESHSTDATA *)((int64_t) pProcData + (pProcData->VUMeshData_Preset.sOffsetToST - 1) * 4);
+    _SGDVUMESHCOLORDATA *pVMCD = (_SGDVUMESHCOLORDATA*) (&pPUHead->pNext + pProcData->VUMeshData_Preset.sOffsetToPrim);
 
     glad_glBindVertexArray(pipeline->vao);
 
@@ -749,23 +741,21 @@ void MikuPan_RenderMeshType0x32(struct SGDPROCUNITHEADER *pVUVN,
     GLfloat *vertices = NULL;
     GLfloat *normals = NULL;
 
-    if (GET_MESH_TYPE(pPUHead) == 0x32)
+    if (mesh_type == 0x32)
     {
         vertices =
             (GLfloat *) (pVUVNData->VUVNData_Preset.aui
                          + (pVUVN->VUVNDesc.sNumNormal) * 3
                          + 10);
     }
-    else if (GET_MESH_TYPE(pPUHead) == 0x12 || GET_MESH_TYPE(pPUHead) == 0x10)
+    else if (mesh_type == 0x12 || mesh_type == 0x10)
     {
         vertices = ((float *) &(((int *) pVUVN)[14]));
     }
 
     size_t byte_size = pVUVN->VUVNDesc.sNumVertex * pipeline->buffers[0].attributes[0].stride;
-    glad_glBindBuffer(GL_ARRAY_BUFFER, pipeline->buffers[0].id);
-    glad_glBufferSubData(GL_ARRAY_BUFFER, 0, byte_size, vertices);
-
     glad_glBindBuffer(GL_ARRAY_BUFFER, pipeline->buffers[1].id);
+
     int vertex_offset = 0;
 
     MikuPan_SetTriangleStripRestart();
@@ -775,9 +765,11 @@ void MikuPan_RenderMeshType0x32(struct SGDPROCUNITHEADER *pVUVN,
         info_log("OVERFLOW!");
     }
 
+    SGDMESHVERTEXDATA_TYPE2* buf = (SGDMESHVERTEXDATA_TYPE2*)temp_render_buffer;
+
     for (int i = 0; i < GET_NUM_MESH(pPUHead); i++)
     {
-        pVMCD = (struct _SGDVUMESHCOLORDATA *) MikuPan_GetNextUnpackAddr((u_int *) pVMCD);
+        pVMCD = (_SGDVUMESHCOLORDATA *) MikuPan_GetNextUnpackAddr((u_int *) pVMCD);
         int vertex_count = pVMCD->VifUnpack.NUM;
 
         MikuPan_FixUV((float*)&sgdMeshData->astData, vertex_count);
@@ -785,22 +777,42 @@ void MikuPan_RenderMeshType0x32(struct SGDPROCUNITHEADER *pVUVN,
 
         glad_glBufferSubData(
             GL_ARRAY_BUFFER,
-            pipeline->buffers[1].attributes[0].stride * vertex_offset,
+            vertex_offset * pipeline->buffers[1].attributes[0].stride,
             vertex_count * pipeline->buffers[1].attributes[0].stride,
             sgdMeshData->astData);
 
-        if (GET_MESH_TYPE(pPUHead) == 0x32)
+        if (mesh_type == 0x32)
         {
             normals = (GLfloat *) (pVUVNData->VUVNData_Preset.aui
                                + (i * 3)
                                + 10);
-            u_int loc = glad_glGetUniformLocation(current_program, "aNormal");
-            glad_glUniform3fv(loc, 1, (float *) normals);
+
+            for (int j = 0; j < vertex_count; j++)
+            {
+                buf[vertex_offset + j].vVertex[0] = vertices[(vertex_offset + j) * 3 + 0];
+                buf[vertex_offset + j].vVertex[1] = vertices[(vertex_offset + j) * 3 + 1];
+                buf[vertex_offset + j].vVertex[2] = vertices[(vertex_offset + j) * 3 + 2];
+
+                buf[vertex_offset + j].vNormal[0] = normals[0];
+                buf[vertex_offset + j].vNormal[1] = normals[1];
+                buf[vertex_offset + j].vNormal[2] = normals[2];
+            }
         }
 
         vertex_offset += vertex_count;
-        sgdMeshData = (struct SGDVUMESHSTDATA *) &sgdMeshData->astData[vertex_count];
-        pVMCD = (struct _SGDVUMESHCOLORDATA *) &pVMCD->avColor[vertex_count];
+        sgdMeshData = (SGDVUMESHSTDATA *) &sgdMeshData->astData[vertex_count];
+        pVMCD = (_SGDVUMESHCOLORDATA *) &pVMCD->avColor[vertex_count];
+    }
+
+    glad_glBindBuffer(GL_ARRAY_BUFFER, pipeline->buffers[0].id);
+
+    if (mesh_type == 0x32)
+    {
+        glad_glBufferSubData(GL_ARRAY_BUFFER, 0, byte_size, buf);
+    }
+    else
+    {
+        glad_glBufferSubData(GL_ARRAY_BUFFER, 0, byte_size, vertices);
     }
 
     draw_calls++;
@@ -814,13 +826,11 @@ void MikuPan_RenderMeshType0x82(unsigned int *pVUVN, unsigned int *pPUHead)
         return;
     }
 
-    MikuPan_SetupAmbientLighting();
-
-    struct SGDVUVNDATA_PRESET *pVUVNData = (struct SGDVUVNDATA_PRESET *) &(((struct SGDPROCUNITHEADER *) pVUVN)[1]);
-    struct SGDVUMESHPOINTNUM *pMeshInfo = (struct SGDVUMESHPOINTNUM *) &(((struct SGDPROCUNITHEADER *) pPUHead)[4]);
-    union SGDPROCUNITDATA *pProcData = (union SGDPROCUNITDATA *) &(((struct SGDPROCUNITHEADER *) pPUHead)[1]);
-    struct SGDVUMESHSTREGSET* sgdVuMeshStRegSet = (struct SGDVUMESHSTREGSET *) &pMeshInfo[GET_NUM_MESH(pPUHead)];
-    struct SGDVUMESHSTDATA* sgdMeshData = (struct SGDVUMESHSTDATA *) &sgdVuMeshStRegSet->auiVifCode[3];
+    SGDVUVNDATA_PRESET *pVUVNData = (SGDVUVNDATA_PRESET *) &(((SGDPROCUNITHEADER *) pVUVN)[1]);
+    SGDVUMESHPOINTNUM *pMeshInfo = (SGDVUMESHPOINTNUM *) &(((SGDPROCUNITHEADER *) pPUHead)[4]);
+    SGDPROCUNITDATA *pProcData = (SGDPROCUNITDATA *) &(((SGDPROCUNITHEADER *) pPUHead)[1]);
+    SGDVUMESHSTREGSET* sgdVuMeshStRegSet = (SGDVUMESHSTREGSET *) &pMeshInfo[GET_NUM_MESH(pPUHead)];
+    SGDVUMESHSTDATA* sgdMeshData = (SGDVUMESHSTDATA *) &sgdVuMeshStRegSet->auiVifCode[3];
     VUVN_PRIM *v = ((VUVN_PRIM *) &((int*)pVUVN)[2]);
 
     MikuPan_SetShaderProgramWithBackup(MESH_0x12_SHADER);
@@ -835,7 +845,10 @@ void MikuPan_RenderMeshType0x82(unsigned int *pVUVN, unsigned int *pPUHead)
     MikuPan_SetRenderState3D();
 
     glad_glBindBuffer(GL_ARRAY_BUFFER, pipeline->buffers[0].id);
-    glad_glBufferSubData(GL_ARRAY_BUFFER, 0, v->vnum * sizeof(struct SGDMESHVERTEXDATA_TYPE2), pVUVNData->avt2);
+    glad_glBufferSubData(GL_ARRAY_BUFFER,
+        0,
+        v->vnum * pipeline->buffers[0].attributes[0].stride,
+        pVUVNData->avt2);
 
     glad_glBindBuffer(GL_ARRAY_BUFFER, pipeline->buffers[1].id);
 
@@ -848,16 +861,16 @@ void MikuPan_RenderMeshType0x82(unsigned int *pVUVN, unsigned int *pPUHead)
             continue;
         }
 
-        MikuPan_FixUV((float*)&sgdMeshData->astData, vertex_count);
+        MikuPan_FixUV((float*)sgdMeshData->astData, vertex_count);
         MikuPan_SetTriangleIndex(vertex_index, vertex_count, vertex_offset, i);
 
         glad_glBufferSubData(
             GL_ARRAY_BUFFER,
-            pipeline->buffers[1].attributes[0].stride * vertex_offset,
-            vertex_count * sizeof(float[2]),
+            vertex_offset * pipeline->buffers[1].attributes[0].stride,
+            vertex_count * pipeline->buffers[1].attributes[0].stride,
             sgdMeshData->astData);
 
-        sgdMeshData = (struct SGDVUMESHSTDATA *) &sgdMeshData->astData[vertex_count];
+        sgdMeshData = (SGDVUMESHSTDATA*) &sgdMeshData->astData[vertex_count];
         vertex_offset += vertex_count;
     }
 
@@ -865,26 +878,21 @@ void MikuPan_RenderMeshType0x82(unsigned int *pVUVN, unsigned int *pPUHead)
     glad_glDrawElements(MikuPan_GetRenderMode(), v->nnum + GET_NUM_MESH(pPUHead), GL_UNSIGNED_INT, vertex_index);
 }
 
-void MikuPan_RenderMeshType0x2(struct SGDPROCUNITHEADER *pVUVN,
-                               struct SGDPROCUNITHEADER *pPUHead, float* vertices)
+void MikuPan_RenderMeshType0x2(SGDPROCUNITHEADER *pVUVN, SGDPROCUNITHEADER *pPUHead, float* vertices)
 {
     if (!MikuPan_IsMesh0x2Rendering())
     {
         return;
     }
 
-    MikuPan_SetupAmbientLighting();
     MikuPan_SetShaderProgramWithBackup(MESH_0x2_SHADER);
     MikuPan_PipelineInfo* pipeline = MikuPan_GetPipelineInfo(POSITION4_NORMAL4_UV);
     VUVN_PRIM *v = ((VUVN_PRIM *) &((int*)pVUVN)[2]);
 
-    struct SGDVUMESHPOINTNUM *pMeshInfo =
-        (struct SGDVUMESHPOINTNUM *) &pPUHead[4];
-    struct SGDVUMESHSTREGSET *sgdVuMeshStRegSet =
-        (struct SGDVUMESHSTREGSET *) &pMeshInfo[GET_NUM_MESH(pPUHead)];
-    struct SGDVUMESHSTDATA *sgdMeshData =
-        (struct SGDVUMESHSTDATA *) &sgdVuMeshStRegSet->auiVifCode[3];
-    union SGDPROCUNITDATA *pProcData = (union SGDPROCUNITDATA *) &pPUHead[1];
+    SGDVUMESHPOINTNUM *pMeshInfo = (SGDVUMESHPOINTNUM *) &pPUHead[4];
+    SGDVUMESHSTREGSET *sgdVuMeshStRegSet = (SGDVUMESHSTREGSET *) &pMeshInfo[GET_NUM_MESH(pPUHead)];
+    SGDVUMESHSTDATA *sgdMeshData = (SGDVUMESHSTDATA *) &sgdVuMeshStRegSet->auiVifCode[3];
+    SGDPROCUNITDATA *pProcData = (SGDPROCUNITDATA *) &pPUHead[1];
 
     glad_glBindVertexArray(pipeline->vao);
 
@@ -915,17 +923,20 @@ void MikuPan_RenderMeshType0x2(struct SGDPROCUNITHEADER *pVUVN,
     {
         int vertex_count = pMeshInfo[i].uiPointNum;
 
-        MikuPan_FixUV((float*)&sgdMeshData->astData, vertex_count);
+        if (pPUHead->VUMeshDesc.MeshType.TEX == 1)
+        {
+            MikuPan_FixUV((float*)&sgdMeshData->astData, vertex_count);
+        }
 
         MikuPan_SetTriangleIndex(vertex_index, vertex_count, vertex_offset, i);
 
         glad_glBufferSubData(
             GL_ARRAY_BUFFER,
-            pipeline->buffers[1].attributes[0].stride * vertex_offset,
+            vertex_offset * pipeline->buffers[1].attributes[0].stride,
             vertex_count * pipeline->buffers[1].attributes[0].stride,
             sgdMeshData->astData);
 
-        sgdMeshData = (struct SGDVUMESHSTDATA *) &sgdMeshData->astData[vertex_count];
+        sgdMeshData = (SGDVUMESHSTDATA *) &sgdMeshData->astData[vertex_count];
         vertex_offset += vertex_count;
     }
 

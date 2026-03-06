@@ -1,15 +1,15 @@
 #include "iopmain.h"
+#include "SDL3/SDL_platform.h"
 #include "cdvd/iopcdvd.h"
 #include "enums.h"
 #include "iop/adpcm/iopadpcm.h"
+#include "iop/se/iopse.h"
 #include "mikupan/mikupan_logging_c.h"
 #include "os/eeiop/eeiop.h"
-#include "iop/se/iopse.h"
 
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_timer.h>
 #include <SDL3/SDL_audio.h>
-#include <SDL3/SDL_log.h>
 #include <SDL3/SDL_stdinc.h>
 
 IOP_STAT iop_stat;
@@ -26,7 +26,10 @@ static SDLCALL int IopMain(void *data);
 
 static int IsRealAudioDriver(const char *drv)
 {
-    if (!drv) return 0;
+    if (!drv)
+    {
+        return 0;
+    }
 
 #if defined(_WIN32)
     return (SDL_strcasecmp(drv, "wasapi") == 0 ||
@@ -54,31 +57,27 @@ static void LogSDLAudioDiagnostics()
     const int n = SDL_GetNumAudioDrivers();
     int has_real_driver = 0;
 
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++)
+    {
         const char *drv = SDL_GetAudioDriver(i);
-        if (IsRealAudioDriver(drv)) {
+        if (IsRealAudioDriver(drv))
+        {
             has_real_driver = 1;
             break;
         }
     }
 
-    if (has_real_driver) {
+    if (has_real_driver)
+    {
         return;
     }
 
-#if defined(_WIN32)
-    info_log("Platform: Windows");
-#elif defined(__linux__)
-    info_log("Platform: Linux");
-#elif defined(__APPLE__)
-    info_log("Platform: macOS");
-#else
-    info_log("Platform: Other");
-#endif
+    info_log("Platform: %s", SDL_GetPlatform());
 
     info_log("Available SDL audio drivers: %d", n);
 
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++)
+    {
         const char *drv = SDL_GetAudioDriver(i);
         info_log("  driver[%d]=%s", i, drv ? drv : "(null)");
     }

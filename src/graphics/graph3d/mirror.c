@@ -507,7 +507,7 @@ int MakeMirrorEnvironment(u_int *prim)
     switch (mtype)
     {
         case 0x12:
-            MikuPan_RenderMeshType0x32((struct SGDPROCUNITHEADER *)vuvnprim, (struct SGDPROCUNITHEADER *)prim);
+            MikuPan_RenderMeshType0x32((SGDPROCUNITHEADER*)vuvnprim, (SGDPROCUNITHEADER*)prim);
             vp = (float *) &vuvnprim[14];
 
             for (j = 0; j < gloops; j++)
@@ -557,7 +557,7 @@ int MakeMirrorEnvironment(u_int *prim)
             }
             break;
         case 0x32:
-            MikuPan_RenderMeshType0x32((struct SGDPROCUNITHEADER *) vuvnprim, (struct SGDPROCUNITHEADER *) prim);
+            MikuPan_RenderMeshType0x32((SGDPROCUNITHEADER *) vuvnprim, (SGDPROCUNITHEADER *) prim);
             vp = (float *) &vuvnprim[14];
             vp = (float *) ((int64_t) vp + ((short *) vuvnprim)[5] * 12);
 

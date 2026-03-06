@@ -22,7 +22,7 @@ void main()
 
     if (renderNormals == 1)
     {
-        FragColor = normalize(vNormal);
+        FragColor = vNormal;
     }
     else
     {

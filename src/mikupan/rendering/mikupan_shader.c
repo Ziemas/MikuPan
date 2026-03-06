@@ -9,13 +9,11 @@ GLuint backup_current_program = 0;
 u_int shader_list[MAX_SHADER_PROGRAMS] = {0};
 
 const char* shader_file_name[MAX_SHADER_PROGRAMS][2] = {
-    {"./resources/shaders/default.vert",            "./resources/shaders/default.frag"},
     {"./resources/shaders/mesh_0x12.vert",          "./resources/shaders/textured_mesh_lighted.frag"},
     {"./resources/shaders/mesh_0x2.vert",           "./resources/shaders/textured_mesh_lighted.frag"},
     {"./resources/shaders/ui_sprite.vert",          "./resources/shaders/ui_sprite.frag"},
     {"./resources/shaders/untextured_sprite.vert",  "./resources/shaders/untextured_sprite.frag"},
-    {"./resources/shaders/simple_textured.vert",    "./resources/shaders/textured_mesh_lighted.frag"},
-    {"./resources/shaders/bounding_box.vert",       "./resources/shaders/bounding_box.frag"},
+    {"./resources/shaders/bounding_box.vert",       "./resources/shaders/untextured_sprite.frag"},
     {"./resources/shaders/sprite_3D.vert",          "./resources/shaders/sprite_3D.frag"},
     {"./resources/shaders/skybox.vert",             "./resources/shaders/skybox.frag"}
 };

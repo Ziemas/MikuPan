@@ -1241,10 +1241,7 @@ void SgReadLights(void *sgd_top, void *light_top, float *Ambient,
         Slight->num = 0;
     }
 
-    if (Ambient != NULL)
-    {
-        Vu0ZeroVector(Ambient);
-    }
+    Vu0ZeroVector(Ambient);
 
     //prim = (u_int *)*pk;
     prim = (u_int *) MikuPan_GetHostPointer((int) *pk);
