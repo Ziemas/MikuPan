@@ -19,16 +19,6 @@
 #define KEYCODE "BA"
 #define PRODUCT_CODE "SLUS-20388"
 
-const char mc_icon_title[];
-const char mc_icon_album[];
-const int mc_bgcolor[4][4];
-const float mc_lightdir[3][4];
-const float mc_lightcol[3][4];
-const float mc_ambient[4];
-const u_char *mc_iconName[];
-const int mc_iconFile[];
-const int mc_iconFileAlbum[];
-
 void mcSetPathDir(char file_no)
 {
     if (mc_ctrl.mode == MC_MODE_GAMESAVE || mc_ctrl.mode == MC_MODE_GAMELOAD || mc_ctrl.mode == MC_MODE_STARTCHECK)

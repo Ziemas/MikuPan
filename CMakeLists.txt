@@ -149,6 +149,7 @@ set(MIKUPAN_SOURCES
         "src/mc/mc_exec.c"
         "src/mc/mc_main.c"
         "src/mc/mc_start.c"
+        "src/mc/mc_icon.c"
         "src/os/eeiop/adpcm/ea_autog.c"
         "src/os/eeiop/adpcm/ea_btlmode.c"
         "src/os/eeiop/adpcm/ea_cmd.c"
