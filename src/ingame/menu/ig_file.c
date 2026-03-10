@@ -13,9 +13,12 @@
 #include "ingame/menu/ig_menu.h"
 #include "ingame/menu/item.h"
 #include "main/glob.h"
+#include "mikupan/mikupan_memory.h"
 #include "os/eeiop/cdvd/eecdvd.h"
 #include "os/eeiop/eese.h"
 #include "os/pad.h"
+
+#include <string.h>
 
 static void FileCntInit();
 static void FileCntRenew();
@@ -4510,7 +4513,7 @@ static void PhotDispCtrl(u_char alp)
         mem_ofs = dsp_box[i].mem_no * 0x10440;
         tim_offset = dsp_box[i].mem_no * 0x204 + 0x3080;
 
-        mem_box[dsp_box[i].mem_no].tx = LoadTIM2Sub(&dmy, (char *)(LOAD_ADDRESS + mem_ofs), 0, tim_offset);
+        mem_box[dsp_box[i].mem_no].tx = LoadTIM2Sub(&dmy, (char *)MikuPan_GetHostPointer(LOAD_ADDRESS + mem_ofs), 0, tim_offset);
     }
 
     if (AllVramTensoOK(3, dsp_box) != 0)

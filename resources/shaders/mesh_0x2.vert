@@ -24,7 +24,8 @@ void main()
     else
     {
         gl_Position = projection * view * model * aPos;
-        vNormal = model * aNormal;
+        //vNormal = transpose(inverse(model)) * aNormal;
+        vNormal = aNormal;
     }
 
 }

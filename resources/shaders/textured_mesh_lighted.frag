@@ -4,6 +4,10 @@ in vec4 vNormal;
 
 out vec4 FragColor;
 
+//uniform mat4 model;
+//uniform mat4 view;
+//uniform mat4 projection;
+
 uniform sampler2D uTexture;
 uniform int renderNormals;
 uniform vec3 lightColor;
@@ -22,6 +26,7 @@ void main()
 
     if (renderNormals == 1)
     {
+        //FragColor = transpose(inverse(model)) * aNormal;
         FragColor = vNormal;
     }
     else
