@@ -443,6 +443,11 @@ static int ICdvdSectorLoad(CDVD_REQ_BUF *req_bufp)
     cdvd_stat.end_size = 0;
     cdvd_stat.id = req_bufp->id;
 
+    if (req_bufp->tmem == TRANS_MEM_SPU)
+    {
+        SeSetStartPoint(req_bufp->se_buf_no, req_bufp->file_no);
+    }
+
     ICdvdDataReadOnceSector(req_bufp);
     cdvd_stat.cmd_on = 1;
     ICdvdSetRetStat(cdvd_stat.id, CDVD_LS_LOADING);
