@@ -12,6 +12,8 @@ extern "C" {
 
 static inline std::vector<int> file_loaded_address;
 
+std::string MikuPan_GetRelativePath(const char* path);
+
 void MikuPan_LoadImgHdFile()
 {
     return MikuPan_ReadFullFile("./IMG_HD.BIN",
@@ -191,9 +193,9 @@ int MikuPan_GetListFiles(const char *folder, MikuPan_McTblGetDir *table)
     return i;
 }
 
-char* MikuPan_GetRelativePath(const char* path)
+std::string MikuPan_GetRelativePath(const char* path)
 {
     auto relative_path = std::filesystem::path("./");
     relative_path += path;
-    return const_cast<char *>(relative_path.generic_u8string().c_str());
+    return relative_path.generic_u8string();
 }

@@ -36,7 +36,6 @@ u_char MikuPan_WriteFile(const char *filename, void *buffer, int size);
 u_char MikuPan_CreateFolder(const char *folder);
 u_char MikuPan_FolderExists(const char *folder);
 int MikuPan_GetListFiles(const char *folder, MikuPan_McTblGetDir *table);
-char* MikuPan_GetRelativePath(const char* path);
 }
 
 #endif//MIKUPAN_FILE_LOADING_H
