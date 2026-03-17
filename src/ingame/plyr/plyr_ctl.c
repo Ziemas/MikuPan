@@ -92,7 +92,8 @@ void PlyrCtrlMain()
 {
     if (dbg_wrk.high_speed_mode != 0 && *key_now[6] != 0)
     {
-        plyr_wrk.spd = 27.5f;
+        //plyr_wrk.spd = 27.5f;
+        plyr_wrk.spd = 2000.0f;
     }
 
     PlyrLightSet();

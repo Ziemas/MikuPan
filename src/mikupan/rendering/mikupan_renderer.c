@@ -556,6 +556,21 @@ void MikuPan_RenderSprite2D(sceGsTex0 *tex, float *buffer)
     glad_glDrawArrays(MikuPan_GetRenderMode(), 0, 4);
 }
 
+void MikuPan_RenderUntexturedSprite(float *buffer)
+{
+    MikuPan_SetCurrentShaderProgram(UNTEXTURED_COLOURED_SPRITE_SHADER);
+    MikuPan_PipelineInfo* pipeline = MikuPan_GetPipelineInfo(POSITION4_COLOUR4);
+
+    glad_glBindVertexArray(pipeline->vao);
+
+    MikuPan_SetRenderState2D();
+
+    glad_glBindBuffer(GL_ARRAY_BUFFER, pipeline->buffers[0].id);
+    glad_glBufferSubData(GL_ARRAY_BUFFER, 0, pipeline->buffers[0].buffer_length, buffer);
+
+    glad_glDrawArrays(MikuPan_GetRenderMode(), 0, 4);
+}
+
 void MikuPan_RenderSprite3D(sceGsTex0 *tex, float* buffer)
 {
     MikuPan_SetCurrentShaderProgram(SPRITE_3D_SHADER);

@@ -12,11 +12,11 @@
 #include "os/eeiop/adpcm/ea_dat.h"
 #include "os/eeiop/adpcm/ea_ctrl.h"
 #include "os/eeiop/adpcm/ea_btlmode.h"
-// #include "os/eeiop/adpcm/ea_cmd.h" // do not include the declaration for `EAdpcmCmdPlay`
+#include "os/eeiop/adpcm/ea_cmd.h"
 #include "ingame/menu/item.h"
 #include "ingame/menu/ig_menu.h"
 #include "ingame/event/ev_main.h"
-// #include "ingame/plyr/plyr_ctl.h" // do not include the declaration for `FinderEndSet`
+#include "ingame/plyr/plyr_ctl.h"
 #include "mikupan/mikupan_memory.h"
 
 #include <string.h>
@@ -35,8 +35,6 @@
 #include "graphics/graph3d/sglib.h"
 #include "graphics/graph3d/libsg.h"
 #include "ingame/event/ev_spcl.h"
-#include "ingame/plyr/plyr_ctl.h"
-#include "os/eeiop/adpcm/ea_cmd.h"
 
 typedef struct { // 0x8
 	/* 0x0 */ void *start_point;
@@ -3506,10 +3504,10 @@ void DispSprtTemp(/* s1 17 */ SPRT_SDAT *ssd, /* a1 5 */ int64_t addr, /* a2 6 *
     DispSprD(&ds);
 }
 
-void TestPk2Data_2dg(/* s1 17 */ long int sendtexaddr)
+void TestPk2Data_2dg(long int sendtexaddr)
 {
-	/* sdata 35642c */ static int ttest_count = 0;
-	/* 0x0(sp) */ SPRT_SDAT ssd;
+	static int ttest_count = 0;
+	SPRT_SDAT ssd;
     
     if (*key_now[8] == 1)
     {
@@ -3532,7 +3530,7 @@ void TestPk2Data_2dg(/* s1 17 */ long int sendtexaddr)
     ssd.alp = 0x80;
     ssd.pri = 0;
     
-    SimpleDispSprt(&ssd,sendtexaddr,ttest_count,NULL,NULL,0x64);
+    SimpleDispSprt(&ssd, sendtexaddr, ttest_count, NULL, NULL, 0x64);
 }
 
 enum T_LOAD_MODE T_LOAD_MODE = 0;

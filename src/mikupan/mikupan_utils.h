@@ -9,6 +9,7 @@
 #define PS2_CENTER_Y 224.0f
 
 void MikuPan_ConvertPs2ScreenCoordToNDCMaintainAspectRatio(float* out, float screen_width, float screen_height, float x, float y);
+void MikuPan_ConvertPs2HalfScreenCoordToNDCMaintainAspectRatio(float* out, float screen_width, float screen_height, float x, float y);
 float MikuPan_ConvertScaleColor(unsigned char color_fragment);
 unsigned char MikuPan_GamePadAxisToPS2(int sdl_axis, int deadzone);
 void MikuPan_GetPS2Viewport(int width, int height, float *vx, float *vy, float *vw, float *vh, float *scale);

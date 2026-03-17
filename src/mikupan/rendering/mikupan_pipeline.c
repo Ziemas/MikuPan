@@ -127,6 +127,30 @@ void MikuPan_InitPipeline()
 
     glad_glEnableVertexAttribArray(0);
 
+    ///////// UNTEXTURED_COLOURED_SPRITE_SHADER /////////
+    /// Buffers for line and square
+    curr_pipeline = &pipelines[POSITION4_COLOUR4];
+    MikuPan_CreateBufferObjectsInfo(curr_pipeline, 1);
+    glad_glGenVertexArrays(1, &curr_pipeline->vao);
+    glad_glBindVertexArray(curr_pipeline->vao);
+
+    /// BUFFER 1: COLOURS + SPRITE POSITION
+    MikuPan_SetBufferObjectInfo(&curr_pipeline->buffers[0], sizeof(float[8]) * 4, 2);
+
+    /// COLOUR
+    MikuPan_SetBufferAttributeInfo(
+        &curr_pipeline->buffers[0].attributes[0],
+        4, 0,
+        sizeof(float[8]), 0);
+
+    /// SPRITE POSITION
+    MikuPan_SetBufferAttributeInfo(
+        &curr_pipeline->buffers[0].attributes[1],
+        4, 1,
+        sizeof(float[8]), sizeof(float[4]));
+
+    glad_glEnableVertexAttribArray(0);
+
     ///////// BOUNDING_BOX_SHADER /////////
     curr_pipeline = &pipelines[POSITION4];
     MikuPan_CreateBufferObjectsInfo(curr_pipeline, 1);

@@ -13,6 +13,7 @@ const char* shader_file_name[MAX_SHADER_PROGRAMS][2] = {
     {"./resources/shaders/mesh_0x2.vert",           "./resources/shaders/textured_mesh_lighted.frag"},
     {"./resources/shaders/ui_sprite.vert",          "./resources/shaders/ui_sprite.frag"},
     {"./resources/shaders/untextured_sprite.vert",  "./resources/shaders/untextured_sprite.frag"},
+    {"./resources/shaders/untextured_coloured_sprite.vert",  "./resources/shaders/untextured_coloured_sprite.frag"},
     {"./resources/shaders/bounding_box.vert",       "./resources/shaders/untextured_sprite.frag"},
     {"./resources/shaders/sprite_3D.vert",          "./resources/shaders/sprite_3D.frag"},
     {"./resources/shaders/skybox.vert",             "./resources/shaders/skybox.frag"}
